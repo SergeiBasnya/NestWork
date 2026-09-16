@@ -21,6 +21,16 @@ enum MemberRole {
   MEMBER
 }
 
+enum WorkspaceAssetSource {
+  CUSTOM
+  MODERN_INTERIORS
+}
+
+enum WorkspaceAssetKind {
+  OBJECT
+  SHEET
+}
+
 enum RoomType {
   OPEN
   MEETING
@@ -74,6 +84,7 @@ model Workspace {
   channels     Channel[]
   mapTemplates MapTemplate[]
   invitations  WorkspaceInvitation[]
+  assets       WorkspaceAsset[]
 }
 
 model WorkspaceMember {
@@ -149,6 +160,31 @@ model Furniture {
   @@index([roomId])
 }
 
+// Private visual libraries installed by a workspace owner/admin. The image
+// bytes remain behind authenticated asset routes; only original NestWork art is
+// bundled in the public web application.
+model WorkspaceAsset {
+  id                 String               @id @default(cuid())
+  workspaceId        String
+  createdBy          String
+  imageId            String
+  name               String
+  source             WorkspaceAssetSource
+  kind               WorkspaceAssetKind
+  cols               Int
+  rows               Int
+  depth              Float                @default(3)
+  licenseConfirmedAt DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  image     Image     @relation(fields: [imageId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, createdAt])
+  @@index([imageId])
+}
+
 // Persisted refresh tokens (rotation + reuse detection). One row per issued
 // refresh token, keyed by its jti; rotation revokes the old row.
 model RefreshToken {
@@ -213,6 +249,7 @@ model Image {
 
   messages     Message[]
   mapTemplates MapTemplate[]
+  workspaceAssets WorkspaceAsset[]
 }
 
 // ─── Messaging ───────────────────────────────────────────

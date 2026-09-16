@@ -8,7 +8,7 @@ import { cachedFetch, invalidate } from '../lib/cache';
 import { getSocket, disconnectSocket } from '../lib/socket';
 import { useAuthStore } from '../stores/auth';
 import { Socket } from 'socket.io-client';
-import type { FurnitureItem, FurnitureCatalogEntry } from '../game/furnitureTypes';
+import type { FurnitureItem, FurnitureCatalogEntry, WorkspaceAsset } from '../game/furnitureTypes';
 import {
   WorkspaceDomainProviders,
   type Desk,
@@ -40,6 +40,8 @@ import type {
   FurnitureTransformPayload,
   SpacePlayerPayload,
   MessageSendAck,
+  WorkspaceAssetCreatePayload,
+  WorkspaceAssetDTO,
 } from '@nestwork/shared';
 
 // Summary of unread DMs and @-mentions found when (re)opening the workspace.
@@ -66,6 +68,11 @@ interface WorkspaceContextValue extends WorkspacePresenceContextValue, Workspace
   changeFurnitureDepth: (id: string, depth: number) => void;
   undoFurniture: () => void;
   canUndoFurniture: boolean;
+  workspaceAssets: WorkspaceAsset[];
+  workspaceAssetsError: string;
+  canManageWorkspaceAssets: boolean;
+  uploadWorkspaceAsset: (payload: WorkspaceAssetCreatePayload) => Promise<{ ok: boolean; error?: string }>;
+  removeWorkspaceAsset: (id: string) => Promise<{ ok: boolean; error?: string }>;
   // Members roster panel (mutually exclusive with the other side-rail panels)
   // Map templates (Phase 1: personal save/load, non-destructive)
   mapTemplates: MapTemplateDTO[];
@@ -168,6 +175,8 @@ export function WorkspaceProvider({ slug, children }: { slug: string; children: 
   // Decorator state
   const [decoratorMode, setDecoratorModeRaw] = useState(false);
   const [furnitureItems, setFurnitureItems] = useState<FurnitureItem[]>([]);
+  const [workspaceAssets, setWorkspaceAssets] = useState<WorkspaceAsset[]>([]);
+  const [workspaceAssetsError, setWorkspaceAssetsError] = useState('');
   const [selectedCatalogItem, setSelectedCatalogItem] = useState<FurnitureCatalogEntry | null>(null);
   const [moveMode, setMoveMode] = useState(false);
   const [eraseMode, setEraseMode] = useState(false);
@@ -238,6 +247,7 @@ export function WorkspaceProvider({ slug, children }: { slug: string; children: 
   // to the list lets the action helpers read current state without stale closures.
   const furnitureItemsRef = useRef<FurnitureItem[]>([]);
   furnitureItemsRef.current = furnitureItems;
+  const assetObjectUrlsRef = useRef<Map<string, string>>(new Map());
   const undoStackRef = useRef<FurnitureUndo[]>([]);
   const [canUndoFurniture, setCanUndoFurniture] = useState(false);
 
@@ -284,6 +294,66 @@ export function WorkspaceProvider({ slug, children }: { slug: string; children: 
       .then((data) => setFurnitureItems(data.furniture))
       .catch(() => {});
   }, [workspace, slug]);
+
+  const loadWorkspaceAssets = useCallback(async () => {
+    try {
+      const { data } = await api.get(`/assets/${slug}`) as { data: { assets: WorkspaceAssetDTO[] } };
+      const incomingIds = new Set(data.assets.map((asset) => asset.id));
+      for (const [id, objectUrl] of assetObjectUrlsRef.current) {
+        if (incomingIds.has(id)) continue;
+        URL.revokeObjectURL(objectUrl);
+        assetObjectUrlsRef.current.delete(id);
+      }
+      const hydrated = await Promise.all(data.assets.map(async (asset): Promise<WorkspaceAsset> => {
+        const existingUrl = assetObjectUrlsRef.current.get(asset.id);
+        if (existingUrl) return { ...asset, objectUrl: existingUrl };
+        const response = await api.get<Blob>(asset.fileUrl, { responseType: 'blob' });
+        const objectUrl = URL.createObjectURL(response.data);
+        assetObjectUrlsRef.current.set(asset.id, objectUrl);
+        return { ...asset, objectUrl };
+      }));
+      setWorkspaceAssets(hydrated);
+      setWorkspaceAssetsError('');
+    } catch {
+      setWorkspaceAssetsError("Impossible de charger la bibliothèque privée");
+    }
+  }, [slug]);
+
+  useEffect(() => {
+    if (!workspace) return;
+    void loadWorkspaceAssets();
+  }, [workspace, loadWorkspaceAssets]);
+
+  useEffect(() => () => {
+    for (const objectUrl of assetObjectUrlsRef.current.values()) URL.revokeObjectURL(objectUrl);
+    assetObjectUrlsRef.current.clear();
+  }, []);
+
+  const uploadWorkspaceAsset = useCallback(async (payload: WorkspaceAssetCreatePayload) => {
+    try {
+      await api.post(`/assets/${slug}`, payload);
+      await loadWorkspaceAssets();
+      return { ok: true };
+    } catch (error: unknown) {
+      const message = isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error
+        : undefined;
+      return { ok: false, error: message ?? "L'asset n'a pas pu être importé" };
+    }
+  }, [slug, loadWorkspaceAssets]);
+
+  const removeWorkspaceAsset = useCallback(async (id: string) => {
+    try {
+      await api.delete(`/assets/${slug}/${id}`);
+      await loadWorkspaceAssets();
+      return { ok: true };
+    } catch (error: unknown) {
+      const message = isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error
+        : undefined;
+      return { ok: false, error: message ?? "L'asset n'a pas pu être supprimé" };
+    }
+  }, [slug, loadWorkspaceAssets]);
 
   // ── Messaging: load channel/DM list + restore unread from localStorage ──
   // Never served from the freshness window: this payload carries unread counts,
@@ -545,6 +615,7 @@ export function WorkspaceProvider({ slug, children }: { slug: string; children: 
     sock.on('furniture:removed', (data: FurnitureRemovePayload) => {
       setFurnitureItems((prev) => prev.filter((f) => f.id !== data.id));
     });
+    sock.on('assets:changed', () => { void loadWorkspaceAssets(); });
 
     // All listeners are registered — now it's safe to open the connection.
     sock.connect();
@@ -557,7 +628,7 @@ export function WorkspaceProvider({ slug, children }: { slug: string; children: 
     };
     // Depend on user.id (stable), NOT the user object — changing the avatar
     // creates a new user object and would otherwise tear down the socket.
-  }, [user?.id, slug, bumpLastMessage, loadChannels]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user?.id, slug, bumpLastMessage, loadChannels, loadWorkspaceAssets]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Proactively refresh the access token before it expires and push it to the
   // socket, so the live session never lapses (the server enforces token expiry).
@@ -1214,6 +1285,11 @@ export function WorkspaceProvider({ slug, children }: { slug: string; children: 
     totalUnread,
   ]);
 
+  const canManageWorkspaceAssets = useMemo(() => {
+    const role = workspace?.members.find((member) => member.userId === user?.id)?.role;
+    return role === 'OWNER' || role === 'ADMIN';
+  }, [workspace, user?.id]);
+
   // Compatibility facade for consumers that genuinely span several domains.
   // New focused consumers should prefer one of the narrower hooks below.
   const value = useMemo<WorkspaceContextValue>(() => ({
@@ -1233,6 +1309,11 @@ export function WorkspaceProvider({ slug, children }: { slug: string; children: 
     changeFurnitureDepth,
     undoFurniture,
     canUndoFurniture,
+    workspaceAssets,
+    workspaceAssetsError,
+    canManageWorkspaceAssets,
+    uploadWorkspaceAsset,
+    removeWorkspaceAsset,
     mapTemplates,
     loadMapTemplates,
     saveMapTemplate,
@@ -1278,6 +1359,11 @@ export function WorkspaceProvider({ slug, children }: { slug: string; children: 
     changeFurnitureDepth,
     undoFurniture,
     canUndoFurniture,
+    workspaceAssets,
+    workspaceAssetsError,
+    canManageWorkspaceAssets,
+    uploadWorkspaceAsset,
+    removeWorkspaceAsset,
     mapTemplates,
     loadMapTemplates,
     saveMapTemplate,

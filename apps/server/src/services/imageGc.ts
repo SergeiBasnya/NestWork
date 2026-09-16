@@ -22,6 +22,10 @@ export const IMAGE_UNREFERENCED_SQL = `
     SELECT 1 FROM "MapTemplate" AS t
     WHERE t."previewImageId" = i."id" OR t."preview" = '/api/images/' || i."id"
   )
+  AND NOT EXISTS (
+    SELECT 1 FROM "WorkspaceAsset" AS a
+    WHERE a."imageId" = i."id"
+  )
 `;
 
 export async function collectOrphanImages(

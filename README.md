@@ -133,7 +133,11 @@ originales NestWork utilisent séparément la licence **CC BY 4.0** ; voir
 Le mode sûr par défaut ne charge que les assets originaux. Un déploiement privé
 possédant séparément Modern Interiors peut activer sa bibliothèque locale avec
 `NEXT_PUBLIC_ASSET_LIBRARY=full`. Ces fichiers ne sont jamais inclus dans
-l’export public. Voir [`docs/asset-library-modes.md`](docs/asset-library-modes.md)
+l’export public. Les propriétaires et administrateurs peuvent aussi importer
+des créations PNG/WebP ou leurs propres fichiers Modern Interiors dans la
+bibliothèque privée d'un espace ; ils restent authentifiés, stockés en base et
+exclus des cartes publiques. Voir
+[`docs/asset-library-modes.md`](docs/asset-library-modes.md)
 et [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
 La procédure de publication se trouve dans

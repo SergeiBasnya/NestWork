@@ -11,7 +11,8 @@ import {
   CHAR_ANIMS,
   CHAR_IDLE_ANIMS,
 } from './constants';
-import type { FurnitureItem, FurnitureCatalogEntry } from './furnitureTypes';
+import type { FurnitureItem, FurnitureCatalogEntry, WorkspaceAsset } from './furnitureTypes';
+import { workspaceAssetIdFromCatalogId } from '@nestwork/shared';
 import {
   catalogCollisionCells,
   catalogGridEdgeSnap,
@@ -97,6 +98,7 @@ export interface SpaceSceneData {
   userId: string;
   userName: string;
   workspaceSlug: string;
+  workspaceAssets?: WorkspaceAsset[];
   character?: string | null;
   spawnDesk?: { x: number; y: number } | null;
   onRoomChange?: (roomId: string | null, roomName: string | null) => void;
@@ -166,6 +168,8 @@ export class SpaceScene extends Phaser.Scene {
   // Structural signature per furniture id, so reconcileFurniture() can skip the
   // (vast majority of) unchanged sprites instead of rebuilding them every sync.
   private furnitureSig: Map<string, string> = new Map();
+  private workspaceAssets: Map<string, WorkspaceAsset> = new Map();
+  private lastFurnitureItems: FurnitureItem[] = [];
   private ghostSprite: Phaser.GameObjects.Image | null = null;
   private placingCatalogItem: FurnitureCatalogEntry | null = null;
   private selectedFurnitureId: string | null = null;
@@ -208,6 +212,7 @@ export class SpaceScene extends Phaser.Scene {
     this.userId = data.userId;
     this.userName = data.userName;
     this.workspaceSlug = data.workspaceSlug;
+    this.workspaceAssets = new Map((data.workspaceAssets ?? []).map((asset) => [asset.id, asset]));
     this.onRoomChange = data.onRoomChange;
     this.onFurniturePlace = data.onFurniturePlace;
     this.onFurnitureMove = data.onFurnitureMove;
@@ -222,6 +227,9 @@ export class SpaceScene extends Phaser.Scene {
   preload() {
     // Every decorator sheet (compatibility sheets + full-pack themes + Room Builder).
     sheetTextures().forEach(({ key, file }) => this.load.image(key, file));
+    for (const asset of this.workspaceAssets.values()) {
+      this.load.image(this.workspaceAssetTextureKey(asset.id), asset.objectUrl);
+    }
 
     CHARACTER_NAMES.forEach((name) => {
       const spec = characterSpriteSpec(name);
@@ -897,6 +905,7 @@ export class SpaceScene extends Phaser.Scene {
   // Replaces the old "destroy + recreate ALL 295 sprites on every update" path,
   // which made placing/moving a single item rebuild the whole map.
   reconcileFurniture(items: FurnitureItem[]) {
+    this.lastFurnitureItems = items;
     const incoming = new Set<string>();
     for (const item of items) {
       incoming.add(item.id);
@@ -1582,8 +1591,42 @@ export class SpaceScene extends Phaser.Scene {
   // Maps a stored catalogId to its source tileset + render depth via the shared
   // sheet registry (handles legacy furniture_/wall_/floor_ and full-pack sheets).
   private sheetForCatalog(catalogId: string): { tex: string; depth: number; tileFill: boolean; bleedEdges: boolean } {
+    const workspaceAssetId = workspaceAssetIdFromCatalogId(catalogId);
+    const workspaceAsset = workspaceAssetId ? this.workspaceAssets.get(workspaceAssetId) : undefined;
+    if (workspaceAsset) {
+      return {
+        tex: this.workspaceAssetTextureKey(workspaceAsset.id),
+        depth: workspaceAsset.depth,
+        tileFill: false,
+        bleedEdges: false,
+      };
+    }
     const sheet = sheetForCatalogId(catalogId);
     return { tex: sheet.tex, depth: sheet.depth, tileFill: !!sheet.tileFill, bleedEdges: !!sheet.bleedEdges };
+  }
+
+  private workspaceAssetTextureKey(assetId: string): string {
+    return `workspace-asset:${assetId}`;
+  }
+
+  setWorkspaceAssets(assets: WorkspaceAsset[]) {
+    this.workspaceAssets = new Map(assets.map((asset) => [asset.id, asset]));
+    if (!this.load || !this.textures) return;
+    const missing = assets.filter((asset) => !this.textures.exists(this.workspaceAssetTextureKey(asset.id)));
+    if (missing.length === 0) {
+      this.reconcileFurniture(this.lastFurnitureItems);
+      return;
+    }
+    for (const asset of missing) {
+      this.load.image(this.workspaceAssetTextureKey(asset.id), asset.objectUrl);
+    }
+    this.load.once(Phaser.Loader.Events.COMPLETE, () => {
+      this.reconcileFurniture(this.lastFurnitureItems);
+      if (this.placingCatalogItem && workspaceAssetIdFromCatalogId(this.placingCatalogItem.id)) {
+        this.createGhostSprite(this.placingCatalogItem);
+      }
+    });
+    this.load.start();
   }
 
   private getOrCreateFurnitureTexture(
@@ -1594,6 +1637,7 @@ export class SpaceScene extends Phaser.Scene {
     h: number,
     bleedSurfaceEdges = false,
   ): string | null {
+    if (!this.textures.exists(tex)) return null;
     const source = this.textures.get(tex).getSourceImage() as HTMLImageElement;
     const srcW = source.width;
     const srcH = source.height;
@@ -1937,7 +1981,7 @@ export class SpaceScene extends Phaser.Scene {
   private isRestackable(id: string): boolean {
     const catalogId = this.furnitureCatalogIds.get(id);
     if (!catalogId || catalogId.startsWith('collision') || animObjectForCatalog(catalogId)) return false;
-    const sheet = sheetForCatalogId(catalogId);
+    const sheet = this.sheetForCatalog(catalogId);
     return !sheet.tileFill && sheet.depth > 1;
   }
 

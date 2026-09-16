@@ -38,6 +38,13 @@ Production builds intentionally fail when `NEXT_PUBLIC_API_URL` is missing,
 invalid or insecure, instead of creating an online frontend that targets
 localhost.
 
+Workspace owners and administrators can upload private PNG/WebP decorator
+assets. They are stored in PostgreSQL, served only through authenticated API
+routes and count toward the database backup. Plan storage for the default quota
+of 50 MB per workspace. Modern Interiors files must be supplied by a user who
+has purchased and accepted the third-party license; they are never bundled by
+NestWork.
+
 ## Deployment order
 
 1. Provision PostgreSQL and a tested backup/restore procedure.

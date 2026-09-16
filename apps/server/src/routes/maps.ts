@@ -7,6 +7,7 @@ import { asyncHandler } from '../middleware/errors';
 import { FURNITURE_DEPTH_MAX, FURNITURE_DEPTH_MIN } from '@nestwork/shared';
 import { mapSaveRateLimit } from '../middleware/rateLimit';
 import { scheduleImageGc } from '../services/imageGc';
+import { workspaceAssetIdsInSnapshot } from '../services/workspaceAssets';
 
 const router: Router = Router();
 
@@ -116,6 +117,23 @@ router.patch('/:slug/:id', asyncHandler(async (req: Request, res: Response) => {
   if (!workspace || !workspace.members.some((m) => m.userId === userId)) {
     res.status(404).json({ error: 'Workspace not found' });
     return;
+  }
+
+  // Private workspace assets cannot travel with a community map: their bytes
+  // are intentionally available only to members of the source workspace.
+  if (isPublic) {
+    const template = await prisma.mapTemplate.findFirst({
+      where: { id, workspaceId: workspace.id, createdBy: userId, kind: 'user' },
+      select: { data: true },
+    });
+    if (!template) {
+      res.status(404).json({ error: 'Template not found' });
+      return;
+    }
+    if (workspaceAssetIdsInSnapshot(template.data).size > 0) {
+      res.status(400).json({ error: 'A map using private workspace assets cannot be published' });
+      return;
+    }
   }
 
   // Only the author can change visibility, and backups are never publishable.

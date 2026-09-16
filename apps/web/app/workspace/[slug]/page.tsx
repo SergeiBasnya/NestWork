@@ -25,6 +25,7 @@ function SpaceView() {
     myDesk,
     desks,
     furnitureItems,
+    workspaceAssets,
     selectedCatalogItem,
     placeFurniture,
     moveFurniture,
@@ -71,6 +72,7 @@ function SpaceView() {
           myDesk={myDesk}
           desks={desks}
           furnitureItems={furnitureItems}
+          workspaceAssets={workspaceAssets}
           selectedCatalogItem={selectedCatalogItem}
           onFurniturePlace={placeFurniture}
           onFurnitureMove={moveFurniture}

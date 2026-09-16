@@ -14,6 +14,7 @@ describe('image lifecycle GC', () => {
     assert.match(IMAGE_UNREFERENCED_SQL, /m\."imageUrl" = '\/api\/images\/' \|\| i\."id"/);
     assert.match(IMAGE_UNREFERENCED_SQL, /t\."previewImageId" = i\."id"/);
     assert.match(IMAGE_UNREFERENCED_SQL, /t\."preview" = '\/api\/images\/' \|\| i\."id"/);
+    assert.match(IMAGE_UNREFERENCED_SQL, /a\."imageId" = i\."id"/);
   });
 
   test('uses the grace cutoff and performs lookup before a guarded delete', async () => {

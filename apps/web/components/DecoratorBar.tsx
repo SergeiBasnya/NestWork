@@ -1,9 +1,16 @@
 'use client';
 
 import { useEffect, useMemo, useState, MouseEvent } from 'react';
-import { Paintbrush, X, Eraser, Ban, FlipHorizontal2, Hand, Undo2, BringToFront, SendToBack, Layers3 } from 'lucide-react';
+import { Paintbrush, X, Eraser, Ban, FlipHorizontal2, Hand, Undo2, BringToFront, SendToBack, Layers3, Upload, Trash2, ExternalLink } from 'lucide-react';
+import {
+  MAX_WORKSPACE_ASSET_BYTES,
+  workspaceAssetCatalogKey,
+  type WorkspaceAssetCreatePayload,
+  type WorkspaceAssetKind,
+  type WorkspaceAssetSource,
+} from '@nestwork/shared';
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { familyKeyForSheet, SHEETS, sheetFamilies, type SheetDef } from '../game/sheets';
+import { familyKeyForSheet, SHEETS, sheetFamilies, type SheetDef, type SheetFamilyDef } from '../game/sheets';
 import { AVAILABLE_ANIM_OBJECTS } from '../game/animObjects';
 
 const CELL = 26; // displayed size per tile in the picker
@@ -11,6 +18,75 @@ const SOURCE_TILE = 32;
 const ANIM_KEY = '__anim__'; // special category value for animated objects
 const FAMILIES = sheetFamilies();
 const DEFAULT_SHEET_KEY = FAMILIES[0]?.sheets[0]?.key ?? 'nw-floor-ivory';
+const MODERN_INTERIORS_URL = 'https://limezu.itch.io/moderninteriors';
+
+function fileNameWithoutExtension(name: string): string {
+  return name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim() || 'Asset importé';
+}
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Lecture du fichier impossible'));
+    reader.onload = () => typeof reader.result === 'string'
+      ? resolve(reader.result)
+      : reject(new Error('Format de fichier invalide'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(dataUrl: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("L'image ne peut pas être décodée"));
+    image.src = dataUrl;
+  });
+}
+
+function decodedDataUrlSize(dataUrl: string): number {
+  const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+  return Math.floor((base64.length * 3) / 4);
+}
+
+async function prepareAssetFile(file: File, kind: WorkspaceAssetKind) {
+  if (!['image/png', 'image/webp'].includes(file.type)) {
+    throw new Error(`${file.name} : seuls PNG et WebP sont acceptés`);
+  }
+  if (file.size > MAX_WORKSPACE_ASSET_BYTES) {
+    throw new Error(`${file.name} dépasse 2,6 Mo`);
+  }
+  const original = await readFileAsDataUrl(file);
+  const image = await loadImage(original);
+  if (image.naturalWidth < 1 || image.naturalHeight < 1) throw new Error(`${file.name} est vide`);
+
+  if (kind === 'SHEET') {
+    if (image.naturalWidth % SOURCE_TILE !== 0 || image.naturalHeight % SOURCE_TILE !== 0) {
+      throw new Error(`${file.name} doit être aligné sur une grille de 32 px`);
+    }
+    const cols = image.naturalWidth / SOURCE_TILE;
+    const rows = image.naturalHeight / SOURCE_TILE;
+    if (cols > 128 || rows > 128) throw new Error(`${file.name} dépasse la grille maximale 128×128`);
+    return { dataUrl: original, cols, rows };
+  }
+
+  const cols = Math.ceil(image.naturalWidth / SOURCE_TILE);
+  const rows = Math.ceil(image.naturalHeight / SOURCE_TILE);
+  if (cols > 128 || rows > 128) throw new Error(`${file.name} dépasse 4096×4096 px`);
+  const canvas = document.createElement('canvas');
+  canvas.width = cols * SOURCE_TILE;
+  canvas.height = rows * SOURCE_TILE;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Canvas indisponible');
+  context.imageSmoothingEnabled = false;
+  // Bottom-align a standalone object so its feet/base stay on the grid.
+  context.drawImage(image, 0, canvas.height - image.naturalHeight);
+  const dataUrl = canvas.toDataURL('image/png');
+  if (decodedDataUrlSize(dataUrl) > MAX_WORKSPACE_ASSET_BYTES) {
+    throw new Error(`${file.name} dépasse 2,6 Mo après normalisation`);
+  }
+  return { dataUrl, cols, rows };
+}
 
 export function DecoratorBar() {
   const {
@@ -28,6 +104,11 @@ export function DecoratorBar() {
     changeFurnitureDepth,
     undoFurniture,
     canUndoFurniture,
+    workspaceAssets,
+    workspaceAssetsError,
+    canManageWorkspaceAssets,
+    uploadWorkspaceAsset,
+    removeWorkspaceAsset,
   } = useWorkspace();
   const [sheetKey, setSheetKey] = useState<string>(DEFAULT_SHEET_KEY);
   // Rectangle being dragged in the picker (cell coords). null = not dragging.
@@ -40,11 +121,49 @@ export function DecoratorBar() {
     ? furnitureItems.find((item) => item.id === selection.id) ?? null
     : null;
   const [depthDraft, setDepthDraft] = useState('');
+  const [importOpen, setImportOpen] = useState(false);
+  const [importSource, setImportSource] = useState<WorkspaceAssetSource>('CUSTOM');
+  const [importKind, setImportKind] = useState<WorkspaceAssetKind>('OBJECT');
+  const [importDepth, setImportDepth] = useState('3');
+  const [importName, setImportName] = useState('');
+  const [importFiles, setImportFiles] = useState<File[]>([]);
+  const [licenseAccepted, setLicenseAccepted] = useState(false);
+  const [importBusy, setImportBusy] = useState(false);
+  const [importMessage, setImportMessage] = useState('');
 
-  const families = useMemo(() => FAMILIES, []);
+  const workspaceSheets = useMemo<SheetDef[]>(() => workspaceAssets.map((asset) => ({
+    key: workspaceAssetCatalogKey(asset.id),
+    tex: `workspace-asset:${asset.id}`,
+    file: asset.objectUrl,
+    label: asset.name,
+    group: asset.source === 'MODERN_INTERIORS' ? 'Modern Interiors privé' : 'Imports privés',
+    cols: asset.cols,
+    rows: asset.rows,
+    depth: asset.depth,
+  })), [workspaceAssets]);
+  const workspaceAssetByKey = useMemo(() => new Map(
+    workspaceAssets.map((asset) => [workspaceAssetCatalogKey(asset.id), asset]),
+  ), [workspaceAssets]);
+  const families = useMemo<SheetFamilyDef[]>(() => {
+    const customSheets = workspaceSheets.filter((sheet) => workspaceAssetByKey.get(sheet.key)?.source === 'CUSTOM');
+    const licensedSheets = workspaceSheets.filter((sheet) => workspaceAssetByKey.get(sheet.key)?.source === 'MODERN_INTERIORS');
+    return [
+      ...FAMILIES,
+      ...(customSheets.length ? [{ key: 'workspace:custom', label: 'Mes imports', sheets: customSheets, original: false }] : []),
+      ...(licensedSheets.length ? [{ key: 'workspace:modern', label: 'Modern Interiors privé', sheets: licensedSheets, original: false }] : []),
+    ];
+  }, [workspaceSheets, workspaceAssetByKey]);
   const isAnim = sheetKey === ANIM_KEY;
-  const sheet: SheetDef = SHEETS.find((s) => s.key === sheetKey) ?? families[0]?.sheets[0] ?? SHEETS[0];
-  const familyKey = isAnim ? ANIM_KEY : familyKeyForSheet(sheet.key) ?? families[0]?.key ?? '';
+  const selectedWorkspaceAsset = workspaceAssetByKey.get(sheetKey);
+  const sheet: SheetDef = SHEETS.find((s) => s.key === sheetKey)
+    ?? workspaceSheets.find((candidate) => candidate.key === sheetKey)
+    ?? families[0]?.sheets[0]
+    ?? SHEETS[0];
+  const familyKey = isAnim
+    ? ANIM_KEY
+    : selectedWorkspaceAsset
+      ? selectedWorkspaceAsset.source === 'MODERN_INTERIORS' ? 'workspace:modern' : 'workspace:custom'
+      : familyKeyForSheet(sheet.key) ?? families[0]?.key ?? '';
   const activeFamily = families.find((family) => family.key === familyKey);
   const rowStart = sheet.rowStart ?? 0;
   const rowEnd = sheet.rowEnd ?? sheet.rows;
@@ -85,7 +204,7 @@ export function DecoratorBar() {
   }
 
   function selectSheet(nextKey: string) {
-    const nextSheet = SHEETS.find((candidate) => candidate.key === nextKey);
+    const nextSheet = [...SHEETS, ...workspaceSheets].find((candidate) => candidate.key === nextKey);
     setSheetKey(nextKey);
     setDrag(null);
     // Changing collection always disarms the previous tool. A single-tile
@@ -95,6 +214,59 @@ export function DecoratorBar() {
     setCollisionMode(false);
     if (nextSheet?.tileFill) activateTileFill(nextSheet);
     else setSelectedCatalogItem(null);
+  }
+
+  async function importAssets() {
+    if (importFiles.length === 0) {
+      setImportMessage('Choisis au moins un fichier PNG ou WebP.');
+      return;
+    }
+    if (importSource === 'MODERN_INTERIORS' && !licenseAccepted) {
+      setImportMessage("Confirme d'abord que tu possèdes une licence Modern Interiors.");
+      return;
+    }
+    setImportBusy(true);
+    setImportMessage('');
+    let imported = 0;
+    try {
+      const kind: WorkspaceAssetKind = importSource === 'MODERN_INTERIORS' ? 'SHEET' : importKind;
+      for (const file of importFiles) {
+        const prepared = await prepareAssetFile(file, kind);
+        const payload: WorkspaceAssetCreatePayload = {
+          name: importFiles.length === 1 && importName.trim() ? importName.trim() : fileNameWithoutExtension(file.name),
+          source: importSource,
+          kind,
+          cols: prepared.cols,
+          rows: prepared.rows,
+          depth: Number(importDepth),
+          dataUrl: prepared.dataUrl,
+          licenseAccepted: importSource === 'MODERN_INTERIORS' ? licenseAccepted : undefined,
+        };
+        const result = await uploadWorkspaceAsset(payload);
+        if (!result.ok) throw new Error(result.error);
+        imported += 1;
+      }
+      setImportFiles([]);
+      setImportName('');
+      setImportMessage(`${imported} asset${imported > 1 ? 's' : ''} importé${imported > 1 ? 's' : ''}.`);
+    } catch (error: unknown) {
+      setImportMessage(error instanceof Error ? error.message : "L'import a échoué");
+    } finally {
+      setImportBusy(false);
+    }
+  }
+
+  async function deleteSelectedWorkspaceAsset() {
+    if (!selectedWorkspaceAsset) return;
+    if (!window.confirm(`Supprimer « ${selectedWorkspaceAsset.name} » de cette bibliothèque ?`)) return;
+    const result = await removeWorkspaceAsset(selectedWorkspaceAsset.id);
+    if (!result.ok) {
+      setImportMessage(result.error ?? 'Suppression impossible');
+      return;
+    }
+    setSheetKey(DEFAULT_SHEET_KEY);
+    setSelectedCatalogItem(null);
+    setImportMessage('Asset supprimé.');
   }
 
   // Ctrl/Cmd+Z undoes the last furniture action while decorating.
@@ -370,10 +542,158 @@ export function DecoratorBar() {
             )}
           </select>
         </label>
+
+        <div className="col-span-2 flex items-center justify-between gap-2">
+          <p className="min-w-0 text-[11px] text-[var(--color-text-tertiary)]">
+            {workspaceAssetsError || `${workspaceAssets.length} asset${workspaceAssets.length === 1 ? '' : 's'} privé${workspaceAssets.length === 1 ? '' : 's'}`}
+          </p>
+          {canManageWorkspaceAssets && (
+            <button
+              type="button"
+              onClick={() => setImportOpen((open) => !open)}
+              aria-expanded={importOpen}
+              className="flex shrink-0 items-center gap-1 rounded-lg border border-[var(--color-border)] px-2 py-1 text-xs font-medium text-[var(--color-text-secondary)] hover:border-honey hover:text-[var(--color-text-primary)]"
+            >
+              <Upload size={13} aria-hidden /> Importer
+            </button>
+          )}
+        </div>
       </div>
 
+      {importOpen && (
+        <div className="flex-1 overflow-auto p-3">
+          <div className="space-y-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-hover-bg)] p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Importer une bibliothèque privée</h3>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-secondary)]">
+                  Les fichiers restent réservés aux membres de cet espace et ne sont jamais ajoutés aux cartes publiques.
+                </p>
+              </div>
+              <button type="button" onClick={() => setImportOpen(false)} aria-label="Fermer l’import" className="rounded p-1 hover:bg-[var(--color-panel-bg)]">
+                <X size={15} aria-hidden />
+              </button>
+            </div>
+
+            <label className="block text-xs font-medium text-[var(--color-text-secondary)]">
+              Origine
+              <select
+                value={importSource}
+                onChange={(event) => {
+                  const source = event.target.value as WorkspaceAssetSource;
+                  setImportSource(source);
+                  if (source === 'MODERN_INTERIORS') setImportKind('SHEET');
+                  setImportMessage('');
+                }}
+                className="mt-1 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-panel-bg)] px-2 py-2 text-sm text-[var(--color-text-primary)]"
+              >
+                <option value="CUSTOM">Mes propres créations</option>
+                <option value="MODERN_INTERIORS">Modern Interiors acheté séparément</option>
+              </select>
+            </label>
+
+            {importSource === 'CUSTOM' && (
+              <label className="block text-xs font-medium text-[var(--color-text-secondary)]">
+                Type de fichier
+                <select
+                  value={importKind}
+                  onChange={(event) => setImportKind(event.target.value as WorkspaceAssetKind)}
+                  className="mt-1 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-panel-bg)] px-2 py-2 text-sm text-[var(--color-text-primary)]"
+                >
+                  <option value="OBJECT">Objet unique — cadrage automatique</option>
+                  <option value="SHEET">Spritesheet — grille stricte de 32 px</option>
+                </select>
+              </label>
+            )}
+
+            <label className="block text-xs font-medium text-[var(--color-text-secondary)]">
+              Fichiers PNG ou WebP
+              <input
+                type="file"
+                accept="image/png,image/webp"
+                multiple
+                onChange={(event) => {
+                  setImportFiles(Array.from(event.target.files ?? []));
+                  setImportMessage('');
+                }}
+                className="mt-1 block w-full text-xs text-[var(--color-text-secondary)] file:mr-2 file:rounded-lg file:border-0 file:bg-honey/15 file:px-2 file:py-1.5 file:font-medium file:text-hive-800"
+              />
+              <span className="mt-1 block text-[11px] font-normal text-[var(--color-text-tertiary)]">2,6 Mo maximum par fichier, 100 assets ou 50 Mo par espace.</span>
+            </label>
+
+            <label className="block text-xs font-medium text-[var(--color-text-secondary)]">
+              Nom {importFiles.length > 1 && '(les noms de fichiers seront utilisés)'}
+              <input
+                type="text"
+                maxLength={80}
+                value={importName}
+                disabled={importFiles.length > 1}
+                onChange={(event) => setImportName(event.target.value)}
+                placeholder={importFiles[0] ? fileNameWithoutExtension(importFiles[0].name) : 'Ex. Canapé bleu'}
+                className="mt-1 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-panel-bg)] px-2 py-2 text-sm text-[var(--color-text-primary)] disabled:opacity-50"
+              />
+            </label>
+
+            <label className="block text-xs font-medium text-[var(--color-text-secondary)]">
+              Plan par défaut
+              <select
+                value={importDepth}
+                onChange={(event) => setImportDepth(event.target.value)}
+                className="mt-1 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-panel-bg)] px-2 py-2 text-sm text-[var(--color-text-primary)]"
+              >
+                <option value="1">Sol</option>
+                <option value="2">Mur / cloison</option>
+                <option value="3">Mobilier / décoration</option>
+              </select>
+            </label>
+
+            {importSource === 'MODERN_INTERIORS' && (
+              <div className="rounded-lg border border-honey/40 bg-honey/10 p-2.5 text-xs leading-relaxed text-[var(--color-text-secondary)]">
+                <a href={MODERN_INTERIORS_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-hive-800 underline">
+                  Acheter Modern Interiors auprès de LimeZu <ExternalLink size={12} aria-hidden />
+                </a>
+                <label className="mt-2 flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    checked={licenseAccepted}
+                    onChange={(event) => setLicenseAccepted(event.target.checked)}
+                    className="mt-0.5"
+                  />
+                  <span>Je confirme posséder une licence valide pour chaque fichier sélectionné et rester responsable du respect de ses conditions.</span>
+                </label>
+              </div>
+            )}
+
+            <div aria-live="polite" className="min-h-5 text-xs text-[var(--color-text-secondary)]">{importMessage}</div>
+            <button
+              type="button"
+              onClick={() => void importAssets()}
+              disabled={importBusy || importFiles.length === 0}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-honey px-3 py-2 text-sm font-semibold text-hive-900 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Upload size={15} aria-hidden /> {importBusy ? 'Import en cours…' : `Importer ${importFiles.length || ''}`}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!importOpen && selectedWorkspaceAsset && (
+        <div className="flex items-center justify-between border-b border-[var(--color-border)] px-3 py-2 text-xs text-[var(--color-text-secondary)]">
+          <span>{selectedWorkspaceAsset.kind === 'OBJECT' ? 'Objet unique' : `Spritesheet ${selectedWorkspaceAsset.cols}×${selectedWorkspaceAsset.rows}`}</span>
+          {canManageWorkspaceAssets && (
+            <button
+              type="button"
+              onClick={() => void deleteSelectedWorkspaceAsset()}
+              className="flex items-center gap-1 rounded px-2 py-1 text-red hover:bg-red/10"
+            >
+              <Trash2 size={13} aria-hidden /> Supprimer
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Animated objects — thumbnail grid */}
-      {isAnim && (
+      {!importOpen && isAnim && (
         <div className="grid flex-1 grid-cols-3 content-start gap-2 overflow-auto p-2">
           {AVAILABLE_ANIM_OBJECTS.map((o) => {
             const id = `anim_${o.key}`;
@@ -412,7 +732,7 @@ export function DecoratorBar() {
 
       {/* Repeatable ground sheet — one explicit brush instead of a tiny,
           ambiguous 1×1 spritesheet picker. */}
-      {!isAnim && sheet.tileFill && (
+      {!importOpen && !isAnim && sheet.tileFill && (
         <div className="flex-1 p-3">
           <button
             type="button"
@@ -440,7 +760,7 @@ export function DecoratorBar() {
 
       {/* Original NestWork sheets expose named objects so users never need to
           guess a multi-tile selection rectangle in the raw spritesheet. */}
-      {!isAnim && !sheet.tileFill && sheet.presets && (
+      {!importOpen && !isAnim && !sheet.tileFill && sheet.presets && (
         <div className="grid flex-1 grid-cols-3 content-start gap-2 overflow-auto p-2">
           {sheet.presets.filter((item) => !item.hiddenInCatalog).map((item) => {
             const active = selectedCatalogItem?.id === item.id;
@@ -488,8 +808,40 @@ export function DecoratorBar() {
         </div>
       )}
 
+      {!importOpen && !isAnim && selectedWorkspaceAsset?.kind === 'OBJECT' && (
+        <div className="flex flex-1 items-start justify-center overflow-auto p-4">
+          <button
+            type="button"
+            onClick={() => selectPreset({
+              id: `${sheet.key}_0_0_${sheet.cols}x${sheet.rows}`,
+              name: sheet.label,
+              category: sheet.key,
+              col: 0,
+              row: 0,
+              w: sheet.cols,
+              h: sheet.rows,
+              depth: sheet.depth,
+            })}
+            className={`flex w-full max-w-xs flex-col items-center gap-3 rounded-xl border p-4 transition-colors ${
+              selectedCatalogItem?.category === sheet.key
+                ? 'border-honey bg-honey/10 ring-2 ring-honey/30'
+                : 'border-[var(--color-border)] hover:border-honey/60'
+            }`}
+          >
+            <img
+              src={sheet.file}
+              alt=""
+              draggable={false}
+              className="max-h-56 max-w-full object-contain"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            <span className="text-sm font-semibold text-[var(--color-text-primary)]">{sheet.label}</span>
+          </button>
+        </div>
+      )}
+
       {/* Tile sheet — click or drag to pick one or many cells */}
-      {!isAnim && !sheet.tileFill && !sheet.presets && (
+      {!importOpen && !isAnim && !sheet.tileFill && !sheet.presets && selectedWorkspaceAsset?.kind !== 'OBJECT' && (
       <div className="flex-1 overflow-auto p-2">
         <div
           onMouseDown={down}
@@ -534,7 +886,7 @@ export function DecoratorBar() {
       )}
 
       {/* Hint */}
-      <div className="border-t border-[var(--color-border)] p-2 text-[11px] leading-snug text-[var(--color-text-tertiary)]">
+      {!importOpen && <div className="border-t border-[var(--color-border)] p-2 text-[11px] leading-snug text-[var(--color-text-tertiary)]">
         {moveMode
           ? '✋ Déplacer — glisse pour te promener sur la carte (même sur les sols). Pour bouger un objet : clique-le d’abord (il se surligne), puis glisse-le. Reprends une tuile dans la liste pour repasser en pose.'
           : collisionMode
@@ -550,7 +902,7 @@ export function DecoratorBar() {
               : isAnim
                 ? '✨ Choisis un objet animé, puis clique sur la carte pour le poser.'
                 : `« ${sheet.label} » : clique OU glisse pour sélectionner plusieurs cases, puis clique sur la carte.`}
-      </div>
+      </div>}
     </div>
   );
 }

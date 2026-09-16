@@ -71,6 +71,7 @@ import channelsRouter from './routes/channels';
 import mapsRouter from './routes/maps';
 import rtcRouter from './routes/rtc';
 import imagesRouter from './routes/images';
+import assetsRouter from './routes/assets';
 import { setupSpaceHandler } from './socket/spaceHandler';
 import { errorHandler, notFoundHandler } from './middleware/errors';
 import { prisma } from './lib/prisma';
@@ -134,6 +135,9 @@ app.use('/api', (req, res, next) => {
 // body than the rest of the API. Mounted with its own parser BEFORE the global
 // 256kb one (which then stays tight for every other route).
 app.use('/api/maps', express.json({ limit: '2mb' }), mapsRouter);
+// Workspace asset images are uploaded as base64 JSON. Each decoded file is
+// capped at 2.6 MB by the route; 4 MB accounts for base64 expansion.
+app.use('/api/assets', express.json({ limit: '4mb' }), assetsRouter);
 
 app.use(express.json({ limit: '256kb' }));
 app.use(cookieParser()); // reads the HttpOnly refresh-token cookie on /api/auth/*

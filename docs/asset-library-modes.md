@@ -12,6 +12,24 @@ Aucune variable n'est nécessaire. Le décorateur expose uniquement les familles
 originaux. Les réactions utilisent les icônes originales rangées dans
 `public/NestWork/emotes/`.
 
+Tous les espaces peuvent aussi constituer leur propre bibliothèque privée depuis
+le décorateur. Un propriétaire ou administrateur peut importer :
+
+- ses propres objets PNG/WebP, automatiquement alignés sur la grille de 32 px ;
+- ses propres spritesheets PNG/WebP déjà alignées sur une grille de 32 px ;
+- les spritesheets Modern Interiors qu'il a lui-même achetées.
+
+Ces fichiers sont stockés en base, accessibles uniquement aux membres
+authentifiés de l'espace et ne sont jamais copiés dans Git ou dans l'export
+public. Les cartes publiques ne peuvent pas être publiées tant qu'elles
+référencent un asset privé. Les limites par défaut sont de 2,6 Mo par fichier,
+100 assets et 50 Mo par espace.
+
+L'option Modern Interiors affiche un lien vers la page officielle d'achat et
+demande une attestation de licence. NestWork ne vend pas le pack, ne vérifie pas
+la transaction et ne transfère aucun droit : chaque utilisateur reste
+responsable du respect de la licence obtenue auprès de l'auteur.
+
 ## Mode privé complet
 
 Une installation qui possède légalement le pack commercial peut définir cette
@@ -31,3 +49,8 @@ Ils restent dans leurs chemins privés existants (`public/Modern`,
 uniquement pour le déploiement complet. Le script `pnpm public:export` les retire
 automatiquement et `pnpm public:check` vérifie aussi leurs empreintes afin de
 détecter une copie renommée.
+
+Ce mode historique est indépendant des imports privés. Il permet à l'exploitant
+d'une instance de préinstaller localement un catalogue commercial complet au
+moment du build, tandis que les imports privés sont ajoutés espace par espace à
+l'exécution.

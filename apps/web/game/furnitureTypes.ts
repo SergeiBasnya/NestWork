@@ -1,6 +1,12 @@
-import type { FurnitureDTO } from '@nestwork/shared';
+import type { FurnitureDTO, WorkspaceAssetDTO } from '@nestwork/shared';
 
 export type FurnitureItem = FurnitureDTO;
+
+// The server DTO deliberately contains only an authenticated file endpoint.
+// The context hydrates it to a browser-local object URL before Phaser sees it.
+export interface WorkspaceAsset extends WorkspaceAssetDTO {
+  objectUrl: string;
+}
 
 export interface CatalogCollisionCell {
   col: number;

@@ -170,6 +170,53 @@ export type FurnitureCommandAck =
   | { ok: true }
   | { ok: false; error: string };
 
+// ─── Private workspace asset libraries ─────────────────
+
+export const WORKSPACE_ASSET_CATALOG_PREFIX = 'wa:';
+export const MAX_WORKSPACE_ASSET_BYTES = 2_600_000;
+
+export type WorkspaceAssetSource = 'CUSTOM' | 'MODERN_INTERIORS';
+export type WorkspaceAssetKind = 'OBJECT' | 'SHEET';
+
+export interface WorkspaceAssetDTO {
+  id: string;
+  name: string;
+  source: WorkspaceAssetSource;
+  kind: WorkspaceAssetKind;
+  cols: number;
+  rows: number;
+  depth: number;
+  fileUrl: string;
+  createdAt: string;
+}
+
+export interface WorkspaceAssetCreatePayload {
+  name: string;
+  source: WorkspaceAssetSource;
+  kind: WorkspaceAssetKind;
+  cols: number;
+  rows: number;
+  depth: number;
+  dataUrl: string;
+  licenseAccepted?: boolean;
+}
+
+export function workspaceAssetCatalogKey(assetId: string): string {
+  return `${WORKSPACE_ASSET_CATALOG_PREFIX}${assetId}`;
+}
+
+export function workspaceAssetIdFromCatalogId(catalogId: string): string | null {
+  if (!catalogId.startsWith(WORKSPACE_ASSET_CATALOG_PREFIX)) return null;
+  const suffix = catalogId.slice(WORKSPACE_ASSET_CATALOG_PREFIX.length);
+  const separator = suffix.indexOf('_');
+  const id = separator === -1 ? suffix : suffix.slice(0, separator);
+  return /^[A-Za-z0-9-]{8,64}$/.test(id) ? id : null;
+}
+
+export function isWorkspaceAssetCatalogId(catalogId: string): boolean {
+  return workspaceAssetIdFromCatalogId(catalogId) !== null;
+}
+
 // ─── Presence / WebRTC signaling ─────────────────────────
 
 export interface SpacePlayerPayload {

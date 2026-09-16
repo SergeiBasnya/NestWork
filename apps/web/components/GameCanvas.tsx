@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Socket } from 'socket.io-client';
-import type { FurnitureItem, FurnitureCatalogEntry } from '../game/furnitureTypes';
+import type { FurnitureItem, FurnitureCatalogEntry, WorkspaceAsset } from '../game/furnitureTypes';
 import type { SpaceScene, RoomData } from '../game/SpaceScene';
 import { syncDecoratorScene, type DecoratorSceneState } from '../game/decoratorBridge';
 
@@ -31,6 +31,7 @@ interface GameCanvasProps {
   eraseMode?: boolean;
   collisionMode?: boolean;
   furnitureItems?: FurnitureItem[];
+  workspaceAssets?: WorkspaceAsset[];
   selectedCatalogItem?: FurnitureCatalogEntry | null;
   onFurniturePlace?: (roomId: string, catalogId: string, col: number, row: number, w: number, h: number, x: number, y: number, depth: number, flip: boolean) => void;
   onFurnitureMove?: (id: string, x: number, y: number) => void;
@@ -61,6 +62,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
     eraseMode,
     collisionMode,
     furnitureItems,
+    workspaceAssets,
     selectedCatalogItem,
     onFurniturePlace,
     onFurnitureMove,
@@ -80,6 +82,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   // Always-fresh reference to the furniture list (used by the ready callback)
   const furnitureRef = useRef(furnitureItems);
   furnitureRef.current = furnitureItems;
+  const workspaceAssetsRef = useRef(workspaceAssets);
+  workspaceAssetsRef.current = workspaceAssets;
   const desksRef = useRef(desks);
   desksRef.current = desks;
   const decoratorStateRef = useRef<DecoratorSceneState>({
@@ -151,6 +155,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
     syncFurniture();
     const scene = sceneRef.current;
     if (!scene) return;
+    scene.setWorkspaceAssets(workspaceAssetsRef.current ?? []);
     scene.setDesks(desksRef.current ?? []);
     syncDecoratorScene(scene, decoratorStateRef.current);
   }, [syncFurniture]);
@@ -206,6 +211,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
             userName,
             character,
             workspaceSlug,
+            workspaceAssets: workspaceAssetsRef.current ?? [],
             spawnDesk: myDeskRef.current ?? null,
             onRoomChange,
             onFurniturePlace: stableOnPlace,
@@ -247,6 +253,10 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
   useEffect(() => {
     syncFurniture();
   }, [furnitureItems, syncFurniture]);
+
+  useEffect(() => {
+    if (sceneReadyRef.current) sceneRef.current?.setWorkspaceAssets(workspaceAssets ?? []);
+  }, [workspaceAssets]);
 
   return (
     <div
