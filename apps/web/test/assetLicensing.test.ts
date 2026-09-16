@@ -58,6 +58,7 @@ test('the public asset mode is original-only while full mode remains opt-in', ()
   const fullFamilies = sheetFamilies(true);
   assert.ok(publicFamilies.every((family) => family.original));
   assert.ok(fullFamilies.some((family) => !family.original));
+  assert.ok(fullFamilies.some((family) => family.sheets.some((sheet) => sheet.key === 'furniture')));
   assert.ok(sheetTextures(false).every((texture) => texture.file.startsWith('/NestWork/')));
   assert.ok(sheetTextures(true).some((texture) => texture.file.startsWith('/Modern/')));
 });

@@ -4,6 +4,20 @@ NestWork sépare les assets originaux distribuables du pack commercial privé.
 Le mode par défaut est volontairement sûr pour un dépôt open source : seuls les
 sprites créés pour NestWork sont proposés et chargés par le navigateur.
 
+## Deux bibliothèques au choix
+
+- **NestWork original — gratuit et inclus** : sols, murs et mobilier peuvent
+  être utilisés immédiatement, sans achat additionnel.
+- **Modern Interiors par LimeZu — pack tiers optionnel** : NestWork est
+  compatible avec ce catalogue, mais le pack doit être acheté séparément auprès
+  de LimeZu. Une personne qui possède déjà le pack peut réutiliser ses fichiers
+  via l'import privé ou, sur une installation complète, ouvrir directement le
+  catalogue historique.
+
+Modern Interiors n'est ni vendu ni concédé sous licence par NestWork. Le lien
+d'achat renvoie vers la page officielle LimeZu et l'utilisateur doit confirmer
+qu'il possède une licence valide avant l'import.
+
 ## Mode open source (défaut)
 
 Aucune variable n'est nécessaire. Le décorateur expose uniquement les familles

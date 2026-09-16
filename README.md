@@ -15,6 +15,7 @@ walking up to a teammate.
 - screen sharing and microphone/camera controls;
 - persistent channels, direct messages and reactions;
 - map editor for floors, walls, furniture and collisions;
+- free original asset library, custom imports and optional Modern Interiors compatibility;
 - workspace and member management;
 - original, grid-native NestWork visual library.
 
@@ -89,6 +90,7 @@ qui est disponible et démarrent une conversation en rapprochant leurs avatars.
 - partage d’écran et contrôles micro/caméra ;
 - canaux persistants, messages privés et réactions ;
 - décorateur avec sols, murs, mobilier et collisions ;
+- bibliothèque originale gratuite, imports personnalisés et compatibilité Modern Interiors optionnelle ;
 - gestion des membres et des espaces ;
 - bibliothèque visuelle NestWork originale adaptée à la grille.
 
@@ -139,6 +141,10 @@ bibliothèque privée d'un espace ; ils restent authentifiés, stockés en base 
 exclus des cartes publiques. Voir
 [`docs/asset-library-modes.md`](docs/asset-library-modes.md)
 et [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+En pratique, chacun peut choisir entre la bibliothèque NestWork originale,
+gratuite et incluse, ou le catalogue Modern Interiors de LimeZu après avoir
+acheté séparément le pack et accepté sa licence.
 
 La procédure de publication se trouve dans
 [`docs/public-release.md`](docs/public-release.md).

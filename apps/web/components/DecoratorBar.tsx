@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, MouseEvent } from 'react';
-import { Paintbrush, X, Eraser, Ban, FlipHorizontal2, Hand, Undo2, BringToFront, SendToBack, Layers3, Upload, Trash2, ExternalLink } from 'lucide-react';
+import { Paintbrush, X, Eraser, Ban, FlipHorizontal2, Hand, Undo2, BringToFront, SendToBack, Layers3, Upload, Trash2, ExternalLink, BadgeCheck, Sparkles } from 'lucide-react';
 import {
   MAX_WORKSPACE_ASSET_BYTES,
   workspaceAssetCatalogKey,
@@ -18,6 +18,7 @@ const SOURCE_TILE = 32;
 const ANIM_KEY = '__anim__'; // special category value for animated objects
 const FAMILIES = sheetFamilies();
 const DEFAULT_SHEET_KEY = FAMILIES[0]?.sheets[0]?.key ?? 'nw-floor-ivory';
+const INSTALLED_LICENSED_FAMILY = FAMILIES.find((family) => !family.original);
 const MODERN_INTERIORS_URL = 'https://limezu.itch.io/moderninteriors';
 
 function fileNameWithoutExtension(name: string): string {
@@ -214,6 +215,20 @@ export function DecoratorBar() {
     setCollisionMode(false);
     if (nextSheet?.tileFill) activateTileFill(nextSheet);
     else setSelectedCatalogItem(null);
+  }
+
+  function openModernInteriorsOption() {
+    const installedSheet = INSTALLED_LICENSED_FAMILY?.sheets[0];
+    if (installedSheet) {
+      setImportOpen(false);
+      selectSheet(installedSheet.key);
+      return;
+    }
+    setImportSource('MODERN_INTERIORS');
+    setImportKind('SHEET');
+    setLicenseAccepted(false);
+    setImportMessage('');
+    setImportOpen(true);
   }
 
   async function importAssets() {
@@ -499,6 +514,59 @@ export function DecoratorBar() {
           </button>
         </div>
       </div>
+
+      {!importOpen && (
+        <section
+          aria-label="Choisir une bibliothèque d’assets"
+          className="grid grid-cols-2 gap-2 border-b border-[var(--color-border)] p-2"
+        >
+          <div className="flex min-w-0 flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-hover-bg)] p-2.5">
+            <span className="inline-flex w-fit items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+              <BadgeCheck size={11} aria-hidden /> Gratuit et inclus
+            </span>
+            <p className="mt-2 text-xs font-semibold text-[var(--color-text-primary)]">Bibliothèque NestWork</p>
+            <p className="mt-1 flex-1 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">
+              Les sols, murs et meubles originaux pour créer un bureau 100 % gratuit.
+            </p>
+            <button
+              type="button"
+              onClick={() => selectSheet(DEFAULT_SHEET_KEY)}
+              className="mt-2 w-fit text-left text-[11px] font-semibold text-hive-800 underline underline-offset-2"
+            >
+              Utiliser la bibliothèque gratuite
+            </button>
+          </div>
+
+          <div className="flex min-w-0 flex-col rounded-xl border border-honey/50 bg-honey/10 p-2.5">
+            <span className="inline-flex w-fit items-center gap-1 rounded-full bg-honey/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-hive-800">
+              <Sparkles size={11} aria-hidden /> Pack tiers optionnel
+            </span>
+            <p className="mt-2 text-xs font-semibold text-[var(--color-text-primary)]">Modern Interiors par LimeZu</p>
+            <p className="mt-1 flex-1 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">
+              Plus de styles avec un pack vendu séparément. Déjà acheté ? Réutilise tes fichiers.
+            </p>
+            <div className="mt-2 flex flex-col items-start gap-1">
+              {(INSTALLED_LICENSED_FAMILY || canManageWorkspaceAssets) && (
+                <button
+                  type="button"
+                  onClick={openModernInteriorsOption}
+                  className="text-left text-[11px] font-semibold text-hive-800 underline underline-offset-2"
+                >
+                  {INSTALLED_LICENSED_FAMILY ? 'Ouvrir le catalogue LimeZu' : 'Importer mon pack acheté'}
+                </button>
+              )}
+              <a
+                href={MODERN_INTERIORS_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] text-[var(--color-text-secondary)] underline underline-offset-2"
+              >
+                Voir le pack chez LimeZu <ExternalLink size={10} aria-hidden />
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Two-level library navigation keeps each list short as assets grow. */}
       <div className="grid grid-cols-2 gap-2 border-b border-[var(--color-border)] p-2">

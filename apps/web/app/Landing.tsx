@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Check,
   Coffee,
+  ExternalLink,
   Github,
   Lock,
   MessageCircle,
@@ -26,6 +27,7 @@ import styles from './Landing.module.css';
 import { GITHUB_URL, landingCopy, type LandingLocale } from './landingCopy';
 
 const pilotEmail = process.env.NEXT_PUBLIC_PILOT_EMAIL || 'contact@nestwork.site';
+const modernInteriorsUrl = 'https://limezu.itch.io/moderninteriors';
 
 export default function Landing({ locale = 'fr' }: { locale?: LandingLocale }) {
   const router = useRouter();
@@ -350,6 +352,9 @@ export default function Landing({ locale = 'fr' }: { locale?: LandingLocale }) {
               <Github size={18} aria-hidden /> {copy.openSource.cta}
             </a>
             <Link href="/credits">{copy.openSource.credits}</Link>
+            <a href={modernInteriorsUrl} target="_blank" rel="noreferrer">
+              {copy.openSource.limezu} <ExternalLink size={14} aria-hidden />
+            </a>
           </div>
           <p className={styles.openSourceNote}>{copy.openSource.note}</p>
         </div>
