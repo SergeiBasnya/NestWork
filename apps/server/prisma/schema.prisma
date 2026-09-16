@@ -1,0 +1,293 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum UserStatus {
+  ONLINE
+  BUSY
+  AWAY
+  OFFLINE
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum RoomType {
+  OPEN
+  MEETING
+  FOCUS
+  CHILL
+}
+
+enum ChannelType {
+  CHANNEL
+  DM
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  avatarUrl    String?
+  character    String?
+  status       UserStatus @default(ONLINE)
+  // "Ne pas déranger" / bureau verrouillé : coupe la visio de proximité tant que c'est actif.
+  dnd          Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  workspaceMembers WorkspaceMember[]
+  ownedWorkspaces  Workspace[]      @relation("owner")
+  channelMembers   ChannelMember[]
+  messages         Message[]
+  reactions        MessageReaction[]
+  channelReads     ChannelRead[]
+  refreshTokens    RefreshToken[]
+  sentInvitations  WorkspaceInvitation[] @relation("invitedBy")
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  avatarUrl   String?
+  ownerId     String
+  owner       User     @relation("owner", fields: [ownerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members      WorkspaceMember[]
+  rooms        Room[]
+  channels     Channel[]
+  mapTemplates MapTemplate[]
+  invitations  WorkspaceInvitation[]
+}
+
+model WorkspaceMember {
+  id          String     @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        MemberRole @default(MEMBER)
+  joinedAt    DateTime   @default(now())
+  // "My desk": claimed spawn position in the space (null = spawn at room center).
+  deskX       Int?
+  deskY       Int?
+
+  user      User      @relation(fields: [userId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([userId, workspaceId])
+}
+
+// Invite-only onboarding for managed pilots. The raw token is never stored:
+// only its SHA-256 digest reaches the database.
+model WorkspaceInvitation {
+  id          String     @id @default(cuid())
+  workspaceId String
+  email       String
+  role        MemberRole @default(MEMBER)
+  tokenHash   String     @unique
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  invitedById String
+  createdAt   DateTime   @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedBy User      @relation("invitedBy", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt])
+  @@index([email])
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  type        RoomType @default(OPEN)
+  capacity    Int      @default(10)
+  posX        Int      @default(0)
+  posY        Int      @default(0)
+  width       Int      @default(100)
+  height      Int      @default(100)
+
+  workspace Workspace   @relation(fields: [workspaceId], references: [id])
+  furniture Furniture[]
+}
+
+model Furniture {
+  id        String   @id @default(cuid())
+  roomId    String
+  placedBy  String
+  catalogId String
+  col       Int
+  row       Int
+  w         Int      @default(1)
+  h         Int      @default(1)
+  x         Int
+  y         Int
+  depth     Float    @default(3)
+  flip      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+}
+
+// Persisted refresh tokens (rotation + reuse detection). One row per issued
+// refresh token, keyed by its jti; rotation revokes the old row.
+model RefreshToken {
+  id        String    @id @default(cuid())
+  jti       String    @unique
+  familyId  String?
+  parentJti String?
+  userId    String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+// A saved map "template": a reusable snapshot of a space's decorations
+// (furniture + collision cells + audio zones) plus a preview thumbnail.
+// Applying one re-creates those decorations in the workspace's room; it never
+// alters the template, and the client takes an auto "backup" template of the
+// current decor before replacing it — so loading a map is always reversible.
+model MapTemplate {
+  id          String   @id @default(cuid())
+  workspaceId String
+  createdBy   String // userId of the author (plain id, like Furniture.placedBy)
+  name        String
+  kind        String   @default("user") // "user" (saved) | "backup" (auto-saved before apply)
+  isPublic    Boolean  @default(false) // published to the community gallery (visible to everyone)
+  preview     String? // thumbnail: "/api/images/<id>" (legacy rows may hold a base64 data URL), null if capture failed
+  previewImageId String?
+  data        Json // { furniture: [...], zones: [...] } — ids/roomIds stripped
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  previewImage Image? @relation(fields: [previewImageId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@index([isPublic])
+  @@index([previewImageId])
+}
+
+// Raw bytes of an inline image (chat attachment, map thumbnail).
+//
+// These used to live as base64 data URLs inside the Message / MapTemplate rows,
+// which made every list response enormous AND uncacheable — a data URL can't be
+// stored by the browser cache, so re-opening a conversation re-downloaded every
+// picture. Storing the bytes here lets us hand out /api/images/<id>, an
+// opaque URL that the browser can cache and revalidate.
+//
+// `id` is 24 random bytes: the URL *is* the capability (see routes/images.ts).
+// `sha256` deduplicates identical uploads and is deliberately never exposed —
+// otherwise anyone holding the same file could derive its URL.
+model Image {
+  id        String   @id // 24 random bytes, base64url — unguessable
+  mime      String
+  bytes     Bytes
+  size      Int
+  sha256    String   @unique
+  createdAt DateTime @default(now())
+
+  messages     Message[]
+  mapTemplates MapTemplate[]
+}
+
+// ─── Messaging ───────────────────────────────────────────
+
+model Channel {
+  id          String      @id @default(cuid())
+  workspaceId String
+  type        ChannelType @default(CHANNEL)
+  name        String? // CHANNEL: required ; DM: null
+  createdBy   String
+  dmKey       String?     @unique // DM: "workspaceId|sortedUserA|sortedUserB" ; CHANNEL: null
+  createdAt   DateTime    @default(now())
+
+  workspace Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  members   ChannelMember[] // DM: 2 rows ; public CHANNEL: empty
+  messages  Message[]
+  reads     ChannelRead[]
+
+  @@index([workspaceId])
+}
+
+model ChannelMember {
+  id        String @id @default(cuid())
+  channelId String
+  userId    String
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  channelId String
+  userId    String
+  body      String
+  imageUrl  String? // optional inline image: "/api/images/<id>" (legacy rows may hold a base64 data URL)
+  imageId   String?
+  createdAt DateTime  @default(now())
+  editedAt  DateTime?
+
+  channel   Channel           @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions MessageReaction[]
+  image     Image?            @relation(fields: [imageId], references: [id], onDelete: Restrict)
+
+  @@index([channelId, createdAt])
+  @@index([imageId])
+}
+
+model MessageReaction {
+  id        String @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+}
+
+// Per-user read cursor for a channel — drives reliable, multi-device unread counts.
+model ChannelRead {
+  id         String   @id @default(cuid())
+  channelId  String
+  userId     String
+  lastReadAt DateTime @default(now())
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@index([userId])
+}

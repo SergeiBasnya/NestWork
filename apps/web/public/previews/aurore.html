@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aurore · Aperçu des animations NestWork</title>
+  <link rel="stylesheet" href="./aurore.css" />
+  <main>
+    <header>
+      <div>
+        <h1>Aurore, en mouvement.</h1>
+        <p>Le nouveau personnage NestWork, avec ses vraies planches d’animation.</p>
+      </div>
+      <button id="pause" type="button">Pause</button>
+    </header>
+    <div class="controls">
+      <label
+        >Fond
+        <select id="background">
+          <option value="light">Clair</option>
+          <option value="dark">Sombre</option>
+        </select></label
+      ><span id="status" role="status">Chargement…</span>
+    </div>
+    <div class="stage">
+      <canvas
+        id="stage"
+        width="960"
+        height="300"
+        tabindex="0"
+        aria-label="Déplacer Aurore avec les flèches du clavier ou cliquer dans la scène"
+      ></canvas>
+    </div>
+    <p class="hint">
+      Clique dans la scène, ou utilise les flèches / ZQSD / WASD. À l’arrêt, Aurore respire et
+      cligne des yeux. À droite : Milo, autre personnage original, à la même échelle de jeu.
+    </p>
+    <div class="grid" id="directions"></div>
+    <footer>
+      <a href="../Characters/original/Aurore_walk.png" download>Télécharger la marche · PNG</a
+      ><a href="../Characters/original/Aurore_idle.png" download>Télécharger le repos · PNG</a>
+      <p>
+        24 images par planche · cellules de 48 × 64 px · fond transparent · droite, dos, gauche,
+        face.
+      </p>
+    </footer>
+  </main>
+  <script src="./aurore.js"></script>
+</html>

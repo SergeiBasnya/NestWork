@@ -1,0 +1,2619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NestWork — Direction Artistique</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   CSS VARIABLES — NestWork Bee Theme
+   ============================================ */
+:root {
+  /* Primary — Honey Gold */
+  --honey-50: #FFF9E6;
+  --honey-100: #FFF0BF;
+  --honey-200: #FFE699;
+  --honey-300: #FFDB66;
+  --honey-400: #FFD033;
+  --honey-500: #FFC500;
+  --honey-600: #E6A800;
+  --honey-700: #CC8C00;
+  --honey-800: #996600;
+  --honey-900: #664400;
+
+  /* Secondary — Hive Dark (warm charcoal) */
+  --hive-50: #F7F5F2;
+  --hive-100: #EBE7E0;
+  --hive-200: #D4CEC3;
+  --hive-300: #B8AFA0;
+  --hive-400: #8C8070;
+  --hive-500: #5C5347;
+  --hive-600: #3D362E;
+  --hive-700: #2A251F;
+  --hive-800: #1C1915;
+  --hive-900: #0E0D0B;
+
+  /* Accent — Propolis Amber */
+  --propolis-400: #FF9F1C;
+  --propolis-500: #F77F00;
+  --propolis-600: #D96B00;
+
+  /* Accent 2 — Royal Jelly (warm purple) */
+  --royal-400: #C17BDB;
+  --royal-500: #A855C7;
+  --royal-600: #8E3FB0;
+
+  /* Accent 3 — Pollen Green */
+  --pollen-400: #8BC34A;
+  --pollen-500: #6FA332;
+  --pollen-600: #558B2F;
+
+  /* Neutrals — Warm */
+  --warm-white: #FFFDF7;
+  --warm-50: #FAF8F4;
+  --warm-100: #F2EFE8;
+  --warm-200: #E8E4DB;
+  --warm-300: #D5D0C5;
+  --warm-400: #B5AFA3;
+  --warm-500: #8A847A;
+
+  /* Functional */
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --error: #F44336;
+  --info: #2196F3;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(92, 83, 71, 0.08);
+  --shadow-md: 0 4px 12px rgba(92, 83, 71, 0.1);
+  --shadow-lg: 0 8px 32px rgba(92, 83, 71, 0.12);
+  --shadow-xl: 0 16px 48px rgba(92, 83, 71, 0.15);
+  --shadow-honey: 0 4px 24px rgba(255, 197, 0, 0.2);
+  --shadow-honey-lg: 0 8px 40px rgba(255, 197, 0, 0.3);
+
+  /* Borders */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--warm-white);
+  color: var(--hive-700);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   HEXAGONAL BACKGROUND PATTERN
+   ============================================ */
+.hex-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0-34L0 16v34l28 16 28-16V16L28 32z' fill='%23CC8C00' fill-opacity='1'/%3E%3C/svg%3E");
+  background-size: 56px 100px;
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(255, 253, 247, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--warm-200);
+  transition: all 0.3s ease;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--hive-700);
+  text-decoration: none;
+}
+
+.nav-logo .logo-hex {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--honey-500), var(--propolis-500));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.nav-links {
+  display: flex; gap: 32px; list-style: none;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--hive-500);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 2px;
+  background: var(--honey-500);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover { color: var(--hive-800); }
+.nav-links a:hover::after { width: 100%; }
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 32px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(255, 197, 0, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; left: -150px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(247, 127, 0, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(5deg); }
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: var(--honey-50);
+  border: 1px solid var(--honey-200);
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--honey-700);
+  margin-bottom: 32px;
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.hero-badge .bee-icon { font-size: 1.1rem; }
+
+.hero h1 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1.05;
+  color: var(--hive-800);
+  margin-bottom: 24px;
+  animation: fadeInUp 0.8s ease 0.1s forwards;
+  opacity: 0;
+}
+
+.hero h1 span {
+  background: linear-gradient(135deg, var(--honey-500), var(--propolis-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--hive-400);
+  max-width: 600px;
+  margin: 0 auto 48px;
+  font-weight: 400;
+  animation: fadeInUp 0.8s ease 0.2s forwards;
+  opacity: 0;
+}
+
+.hero-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--warm-500);
+  animation: fadeInUp 0.8s ease 0.3s forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   SECTIONS — GENERAL
+   ============================================ */
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 32px;
+}
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--honey-600);
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--hive-800);
+  margin-bottom: 16px;
+  line-height: 1.15;
+}
+
+.section-desc {
+  font-size: 1.1rem;
+  color: var(--hive-400);
+  max-width: 640px;
+  margin-bottom: 48px;
+}
+
+/* ============================================
+   01 — BRAND CONCEPT
+   ============================================ */
+.brand-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.brand-card {
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  transition: all 0.3s ease;
+}
+
+.brand-card:hover {
+  border-color: var(--honey-300);
+  box-shadow: var(--shadow-honey);
+  transform: translateY(-2px);
+}
+
+.brand-card-icon {
+  width: 56px; height: 56px;
+  background: var(--honey-50);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.brand-card h3 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--hive-700);
+  margin-bottom: 12px;
+}
+
+.brand-card p {
+  color: var(--hive-400);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.brand-card-full {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, var(--honey-50), var(--warm-50));
+}
+
+/* ============================================
+   02 — LOGO
+   ============================================ */
+.logo-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.logo-variant {
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-xl);
+  padding: 48px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.logo-variant:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.logo-variant.dark-bg {
+  background: var(--hive-700);
+  border-color: var(--hive-600);
+}
+
+.logo-variant.honey-bg {
+  background: linear-gradient(135deg, var(--honey-500), var(--propolis-400));
+  border-color: var(--honey-400);
+}
+
+.logo-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-hexagon {
+  width: 52px; height: 52px;
+  position: relative;
+}
+
+.logo-hexagon svg { width: 100%; height: 100%; }
+
+.logo-text {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  letter-spacing: -0.5px;
+}
+
+.logo-text.light { color: var(--hive-800); }
+.logo-text.white { color: white; }
+
+.logo-variant-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--warm-400);
+}
+
+.logo-variant.dark-bg .logo-variant-label { color: var(--hive-400); }
+.logo-variant.honey-bg .logo-variant-label { color: rgba(255,255,255,0.7); }
+
+/* ============================================
+   03 — COLOR PALETTE
+   ============================================ */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.palette-group h4 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--hive-600);
+  margin-bottom: 12px;
+}
+
+.palette-stack {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.palette-swatch {
+  padding: 20px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.palette-swatch .swatch-name { font-weight: 600; }
+
+/* ============================================
+   04 — TYPOGRAPHY
+   ============================================ */
+.typo-showcase {
+  margin-top: 48px;
+}
+
+.typo-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--warm-200);
+  align-items: baseline;
+}
+
+.typo-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--warm-500);
+}
+
+.typo-meta strong {
+  display: block;
+  color: var(--hive-600);
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.typo-sample-h1 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 3.5rem;
+  color: var(--hive-800);
+  line-height: 1.1;
+}
+
+.typo-sample-h2 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--hive-700);
+}
+
+.typo-sample-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  color: var(--hive-500);
+  line-height: 1.7;
+}
+
+.typo-sample-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--propolis-500);
+  background: var(--warm-50);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--warm-200);
+}
+
+.typo-sample-ui {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--hive-600);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.typo-sample-ui .tag {
+  padding: 6px 14px;
+  background: var(--honey-50);
+  color: var(--honey-700);
+  border-radius: 100px;
+  font-size: 0.8rem;
+}
+
+/* ============================================
+   05 — ICONOGRAPHY
+   ============================================ */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.icon-item {
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-lg);
+  padding: 28px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.icon-item:hover {
+  border-color: var(--honey-300);
+  box-shadow: var(--shadow-honey);
+  transform: translateY(-2px);
+}
+
+.icon-item svg {
+  width: 32px; height: 32px;
+  color: var(--hive-600);
+}
+
+.icon-item span {
+  font-size: 0.75rem;
+  color: var(--warm-500);
+  font-weight: 500;
+}
+
+/* ============================================
+   06 — UI COMPONENTS
+   ============================================ */
+.components-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.comp-card {
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  overflow: hidden;
+}
+
+.comp-card h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--warm-500);
+  margin-bottom: 24px;
+}
+
+/* Buttons */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--honey-500), var(--propolis-400));
+  color: white;
+  box-shadow: var(--shadow-honey);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-honey-lg); }
+
+.btn-secondary {
+  background: var(--hive-700);
+  color: white;
+}
+.btn-secondary:hover { background: var(--hive-800); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--hive-600);
+  border: 2px solid var(--warm-200);
+}
+.btn-outline:hover { border-color: var(--honey-400); color: var(--honey-700); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--honey-600);
+}
+.btn-ghost:hover { background: var(--honey-50); }
+
+.btn-sm { padding: 8px 16px; font-size: 0.8rem; border-radius: var(--radius-sm); }
+
+/* Inputs */
+.input-group { margin-bottom: 16px; }
+
+.input-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--hive-600);
+  margin-bottom: 6px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--warm-200);
+  border-radius: var(--radius-md);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: var(--hive-700);
+  background: var(--warm-50);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--honey-400);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(255, 197, 0, 0.1);
+}
+
+.input-field::placeholder { color: var(--warm-400); }
+
+/* Cards */
+.sample-card {
+  background: var(--warm-50);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+  border: 1px solid var(--warm-200);
+}
+
+.sample-card-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--honey-300), var(--propolis-400));
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.sample-card-content { flex: 1; }
+.sample-card-name { font-weight: 700; color: var(--hive-700); font-size: 0.9rem; }
+.sample-card-role { font-size: 0.8rem; color: var(--warm-500); }
+
+.sample-card-badge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.badge-online { background: #E8F5E9; color: #2E7D32; }
+.badge-busy { background: #FFF3E0; color: #E65100; }
+.badge-away { background: var(--warm-100); color: var(--warm-500); }
+
+/* Tags */
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.tag {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tag-honey { background: var(--honey-50); color: var(--honey-700); border: 1px solid var(--honey-200); }
+.tag-propolis { background: #FFF3E0; color: var(--propolis-600); border: 1px solid #FFE0B2; }
+.tag-pollen { background: #E8F5E9; color: var(--pollen-600); border: 1px solid #C8E6C9; }
+.tag-royal { background: #F3E5F5; color: var(--royal-600); border: 1px solid #E1BEE7; }
+
+/* Notifications */
+.notif {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.notif-success { background: #E8F5E9; color: #2E7D32; border-left: 4px solid var(--success); }
+.notif-warning { background: #FFF3E0; color: #E65100; border-left: 4px solid var(--warning); }
+.notif-error { background: #FFEBEE; color: #C62828; border-left: 4px solid var(--error); }
+.notif-info { background: #E3F2FD; color: #1565C0; border-left: 4px solid var(--info); }
+
+/* ============================================
+   07 — HEXAGONAL UI CONCEPT
+   ============================================ */
+.hex-concept {
+  background: linear-gradient(180deg, var(--warm-50), white);
+  border-radius: var(--radius-2xl);
+  padding: 80px 40px;
+  margin-top: 48px;
+  text-align: center;
+  border: 1px solid var(--warm-200);
+  position: relative;
+  overflow: hidden;
+}
+
+.hex-concept::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0-34L0 16v34l28 16 28-16V16L28 32z' fill='%23CC8C00' fill-opacity='1'/%3E%3C/svg%3E");
+}
+
+.hex-rooms {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  position: relative;
+}
+
+.hex-room {
+  width: 140px; height: 160px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.hex-room::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: white;
+  border: 2px solid var(--warm-200);
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+.hex-room:hover::before {
+  border-color: var(--honey-400);
+  background: var(--honey-50);
+  box-shadow: var(--shadow-honey);
+}
+
+.hex-room:hover { transform: scale(1.05); }
+
+.hex-room-icon { font-size: 1.6rem; }
+.hex-room-name {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--hive-600);
+}
+.hex-room-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--warm-500);
+}
+
+.hex-row-offset { margin-top: -28px; }
+
+/* ============================================
+   08 — MOCKUPS
+   ============================================ */
+.mockup-section {
+  margin-top: 48px;
+}
+
+.mockup-frame {
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  margin-bottom: 48px;
+}
+
+.mockup-browser-bar {
+  background: var(--warm-50);
+  border-bottom: 1px solid var(--warm-200);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.browser-dots {
+  display: flex; gap: 6px;
+}
+.browser-dots span {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.browser-dots span:nth-child(1) { background: #FF5F57; }
+.browser-dots span:nth-child(2) { background: #FFBD2E; }
+.browser-dots span:nth-child(3) { background: #28C840; }
+
+.browser-url {
+  flex: 1;
+  background: white;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--warm-500);
+  border: 1px solid var(--warm-200);
+}
+
+.mockup-content {
+  min-height: 500px;
+  position: relative;
+}
+
+/* --- MOCKUP: Dashboard --- */
+.mock-dashboard {
+  display: grid;
+  grid-template-columns: 64px 240px 1fr;
+  min-height: 540px;
+}
+
+.mock-sidebar-mini {
+  background: var(--hive-700);
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mock-sidebar-mini .mini-logo {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--honey-500), var(--propolis-400));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  margin-bottom: 16px;
+}
+
+.mock-sidebar-mini .mini-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--hive-400);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.mock-sidebar-mini .mini-icon:hover,
+.mock-sidebar-mini .mini-icon.active {
+  background: rgba(255, 197, 0, 0.15);
+  color: var(--honey-400);
+}
+
+.mock-sidebar-panel {
+  background: var(--warm-50);
+  border-right: 1px solid var(--warm-200);
+  padding: 20px 16px;
+}
+
+.mock-sidebar-panel h3 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--hive-700);
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.mock-channel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 2px;
+}
+
+.mock-channel:hover { background: var(--warm-100); }
+.mock-channel.active { background: var(--honey-50); }
+
+.mock-channel-hex {
+  width: 28px; height: 28px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  font-size: 0.7rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.mock-channel-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--hive-600);
+  flex: 1;
+}
+
+.mock-channel-badge {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--honey-500);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.mock-main {
+  padding: 24px;
+  background: white;
+}
+
+.mock-main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--warm-200);
+}
+
+.mock-main-title {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.mock-main-title h2 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--hive-700);
+}
+
+.mock-main-title .online-count {
+  font-size: 0.75rem;
+  color: var(--pollen-500);
+  font-weight: 600;
+}
+
+.mock-main-actions { display: flex; gap: 8px; }
+
+.mock-action-btn {
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--warm-200);
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--hive-500);
+  transition: all 0.2s ease;
+}
+
+.mock-action-btn:hover {
+  border-color: var(--honey-300);
+  background: var(--honey-50);
+}
+
+/* Chat Messages */
+.mock-messages { display: flex; flex-direction: column; gap: 20px; }
+
+.mock-msg {
+  display: flex; gap: 12px;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.mock-msg-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.mock-msg-content { flex: 1; }
+
+.mock-msg-header {
+  display: flex; align-items: baseline; gap: 8px;
+  margin-bottom: 4px;
+}
+
+.mock-msg-name { font-weight: 700; font-size: 0.85rem; color: var(--hive-700); }
+.mock-msg-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--warm-400);
+}
+
+.mock-msg-text { font-size: 0.9rem; color: var(--hive-500); line-height: 1.6; }
+
+.mock-msg-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--warm-50);
+  border: 1px solid var(--warm-200);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mock-msg-reaction:hover {
+  background: var(--honey-50);
+  border-color: var(--honey-200);
+}
+
+/* Chat Input */
+.mock-chat-input {
+  margin-top: 24px;
+  padding: 14px 18px;
+  background: var(--warm-50);
+  border: 2px solid var(--warm-200);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mock-chat-input span {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--warm-400);
+}
+
+.mock-chat-input-actions {
+  display: flex; gap: 8px;
+}
+
+.mock-chat-icon {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--warm-400);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.mock-chat-icon:hover {
+  background: var(--honey-50);
+  color: var(--honey-600);
+}
+
+/* --- MOCKUP: Task Board --- */
+.mock-taskboard {
+  padding: 24px;
+  background: var(--warm-50);
+  min-height: 540px;
+}
+
+.mock-taskboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.mock-taskboard-header h2 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--hive-700);
+  display: flex; align-items: center; gap: 10px;
+}
+
+.mock-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.mock-column {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border: 1px solid var(--warm-200);
+}
+
+.mock-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid;
+}
+
+.mock-column-header.nectar { border-color: var(--honey-500); }
+.mock-column-header.processing { border-color: var(--propolis-500); }
+.mock-column-header.honey { border-color: var(--pollen-500); }
+
+.mock-column-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--hive-600);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.mock-column-count {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--warm-100);
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--hive-500);
+}
+
+.mock-task {
+  background: var(--warm-50);
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mock-task:hover {
+  border-color: var(--honey-300);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.mock-task-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--hive-700);
+  margin-bottom: 8px;
+}
+
+.mock-task-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mock-task-tags { display: flex; gap: 4px; }
+
+.mock-task-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.mock-task-assignee {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+/* --- MOCKUP: Virtual Space --- */
+.mock-space {
+  min-height: 540px;
+  background: var(--warm-50);
+  position: relative;
+  overflow: hidden;
+}
+
+.mock-space-floor {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0-34L0 16v34l28 16 28-16V16L28 32z' fill='%23CC8C00' fill-opacity='1'/%3E%3C/svg%3E");
+  background-size: 40px 72px;
+}
+
+.mock-space-toolbar {
+  position: absolute;
+  top: 16px; left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-xl);
+  padding: 8px 16px;
+  display: flex;
+  gap: 4px;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
+
+.mock-space-tool {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  color: var(--hive-500);
+}
+
+.mock-space-tool:hover, .mock-space-tool.active {
+  background: var(--honey-50);
+  color: var(--honey-600);
+}
+
+/* Hexagonal rooms in virtual space */
+.mock-space-rooms {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.mock-space-hex {
+  position: absolute;
+  width: 160px; height: 184px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.mock-space-hex::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+.mock-space-hex.room-dev { left: 0; top: 0; }
+.mock-space-hex.room-dev::before { background: linear-gradient(135deg, var(--honey-50), white); border: 2px solid var(--honey-200); }
+
+.mock-space-hex.room-design { left: 150px; top: 0; }
+.mock-space-hex.room-design::before { background: linear-gradient(135deg, #F3E5F5, white); border: 2px solid #E1BEE7; }
+
+.mock-space-hex.room-meeting { left: 75px; top: 140px; }
+.mock-space-hex.room-meeting::before { background: linear-gradient(135deg, #FFF3E0, white); border: 2px solid #FFE0B2; }
+
+.mock-space-hex .room-emoji { font-size: 1.8rem; }
+.mock-space-hex .room-label {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--hive-600);
+}
+.mock-space-hex .room-members {
+  font-size: 0.65rem;
+  color: var(--warm-500);
+}
+
+/* Avatars in space */
+.mock-space-avatar {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+  animation: avatarBob 3s ease-in-out infinite;
+}
+
+.mock-space-avatar-circle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border: 2px solid white;
+}
+
+.mock-space-avatar-name {
+  background: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--hive-600);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.mock-space-avatar-status {
+  position: absolute;
+  bottom: 18px; right: -2px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+@keyframes avatarBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Presence Bar */
+.mock-space-presence {
+  position: absolute;
+  bottom: 16px; left: 16px; right: 16px;
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-xl);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+}
+
+.mock-presence-users {
+  display: flex;
+  gap: -4px;
+}
+
+.mock-presence-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-right: -6px;
+  border: 2px solid white;
+}
+
+.mock-presence-info {
+  font-size: 0.8rem;
+  color: var(--hive-500);
+  font-weight: 500;
+}
+
+.mock-presence-info strong { color: var(--pollen-500); }
+
+/* ============================================
+   09 — VOCABULARY / LEXIQUE
+   ============================================ */
+.lexicon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.lexicon-item {
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: all 0.2s ease;
+}
+
+.lexicon-item:hover {
+  border-color: var(--honey-300);
+  box-shadow: var(--shadow-sm);
+}
+
+.lexicon-icon {
+  width: 44px; height: 44px;
+  background: var(--honey-50);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.lexicon-content h4 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--hive-700);
+  margin-bottom: 2px;
+}
+
+.lexicon-content .lexicon-original {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--warm-400);
+  margin-bottom: 6px;
+}
+
+.lexicon-content p {
+  font-size: 0.85rem;
+  color: var(--hive-400);
+  line-height: 1.5;
+}
+
+/* ============================================
+   10 — MOTION & ANIMATION GUIDELINES
+   ============================================ */
+.motion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.motion-card {
+  background: white;
+  border: 1px solid var(--warm-200);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  text-align: center;
+}
+
+.motion-card h4 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--hive-700);
+  margin-bottom: 8px;
+}
+
+.motion-card p {
+  font-size: 0.8rem;
+  color: var(--warm-500);
+  margin-bottom: 20px;
+}
+
+.motion-demo {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.motion-bee {
+  font-size: 1.8rem;
+  animation: beeFly 2s ease-in-out infinite;
+}
+
+@keyframes beeFly {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(20px, -15px) rotate(5deg); }
+  50% { transform: translate(0, -5px) rotate(0deg); }
+  75% { transform: translate(-20px, -15px) rotate(-5deg); }
+}
+
+.motion-hex-pulse {
+  width: 50px; height: 57px;
+  background: var(--honey-400);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  animation: hexPulse 2s ease-in-out infinite;
+}
+
+@keyframes hexPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.7; }
+}
+
+.motion-slide-demo {
+  width: 60px; height: 60px;
+  background: linear-gradient(135deg, var(--honey-300), var(--propolis-400));
+  border-radius: var(--radius-md);
+  animation: slideReveal 2.5s ease-in-out infinite;
+}
+
+@keyframes slideReveal {
+  0%, 100% { transform: translateX(-30px); opacity: 0; }
+  30%, 70% { transform: translateX(0); opacity: 1; }
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 32px;
+  border-top: 1px solid var(--warm-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-text {
+  font-size: 0.85rem;
+  color: var(--warm-500);
+}
+
+.footer-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--warm-400);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .brand-grid, .components-grid, .logo-showcase, .motion-grid { grid-template-columns: 1fr; }
+  .mock-dashboard { grid-template-columns: 1fr; }
+  .mock-sidebar-mini, .mock-sidebar-panel { display: none; }
+  .mock-columns { grid-template-columns: 1fr; }
+  .typo-row { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+}
+
+/* ============================================
+   SCROLL ANIMATIONS
+   ============================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mockup-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--honey-600);
+  margin-bottom: 16px;
+}
+
+.mockup-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--hive-700);
+  margin-bottom: 8px;
+}
+
+.mockup-desc {
+  font-size: 0.95rem;
+  color: var(--hive-400);
+  margin-bottom: 24px;
+  max-width: 600px;
+}
+</style>
+</head>
+<body>
+
+<div class="hex-bg"></div>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="logo-hex">N</div>
+      NestWork
+    </a>
+    <ul class="nav-links">
+      <li><a href="#concept">Concept</a></li>
+      <li><a href="#logo">Logo</a></li>
+      <li><a href="#colors">Couleurs</a></li>
+      <li><a href="#typo">Typographie</a></li>
+      <li><a href="#components">Composants</a></li>
+      <li><a href="#mockups">Mockups</a></li>
+      <li><a href="#lexicon">Lexique</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div>
+    <div class="hero-badge">
+      <span class="bee-icon">🐝</span>
+      Direction Artistique v1.0
+    </div>
+    <h1><span>Nest</span>Work</h1>
+    <p class="hero-subtitle">L'espace de travail virtuel où chaque équipe trouve sa ruche. Une direction artistique moderne inspirée de l'intelligence collective des abeilles.</p>
+    <p class="hero-tag">AZAPP Lab — 2026</p>
+  </div>
+</header>
+
+<!-- 01 — BRAND CONCEPT -->
+<section class="section" id="concept">
+  <div class="reveal">
+    <span class="section-label">01 — Concept de Marque</span>
+    <h2 class="section-title">L'intelligence collective,<br>réinventée.</h2>
+    <p class="section-desc">NestWork puise son identité dans la ruche : un système où chaque individu contribue à un objectif commun, avec une organisation fluide et une communication constante.</p>
+  </div>
+
+  <div class="brand-grid">
+    <div class="brand-card reveal">
+      <div class="brand-card-icon">🏠</div>
+      <h3>La Ruche — L'Espace</h3>
+      <p>L'espace de travail est une ruche vivante. Chaque salle est une alvéole hexagonale, créant un environnement modulable et organique. Les équipes gravitent naturellement entre ces espaces.</p>
+    </div>
+    <div class="brand-card reveal">
+      <div class="brand-card-icon">🐝</div>
+      <h3>L'Essaim — L'Équipe</h3>
+      <p>Comme un essaim, les membres de l'équipe sont connectés en permanence. La présence visuelle et les micro-interactions créent un sentiment d'appartenance même à distance.</p>
+    </div>
+    <div class="brand-card reveal">
+      <div class="brand-card-icon">🍯</div>
+      <h3>Le Miel — Le Résultat</h3>
+      <p>Les tâches sont du nectar transformé en miel. Le flux de travail suit le cycle naturel : collecte → transformation → production. Chaque livrable est le fruit d'un effort collectif.</p>
+    </div>
+    <div class="brand-card reveal">
+      <div class="brand-card-icon">💐</div>
+      <h3>Le Pollen — Les Idées</h3>
+      <p>Les idées circulent comme le pollen entre les fleurs. Les canaux de communication permettent la pollinisation croisée entre projets et équipes.</p>
+    </div>
+    <div class="brand-card brand-card-full reveal">
+      <div class="brand-card-icon">⬡</div>
+      <h3>L'Hexagone — Le Fil Conducteur</h3>
+      <p>La forme hexagonale est omniprésente : avatars, boutons, espaces, icônes. C'est la structure la plus efficace de la nature — un maximum d'espace avec un minimum de matière. Cette forme incarne l'efficacité et la collaboration qui sont au cœur de NestWork.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 — LOGO -->
+<section class="section" id="logo">
+  <div class="reveal">
+    <span class="section-label">02 — Logo</span>
+    <h2 class="section-title">L'identité NestWork</h2>
+    <p class="section-desc">Un hexagone stylisé contenant les ailes d'une abeille abstraite. Le logotype utilise Outfit Black pour transmettre force et modernité.</p>
+  </div>
+
+  <div class="logo-showcase">
+    <div class="logo-variant reveal">
+      <div class="logo-main">
+        <div class="logo-hexagon">
+          <svg viewBox="0 0 52 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M26 0L52 15V45L26 60L0 45V15L26 0Z" fill="url(#grad1)"/>
+            <path d="M18 22C18 22 22 18 26 22C30 26 34 22 34 22" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M18 30C18 30 22 26 26 30C30 34 34 30 34 30" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M22 38C22 38 24 36 26 38C28 40 30 38 30 38" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
+            <defs>
+              <linearGradient id="grad1" x1="0" y1="0" x2="52" y2="60">
+                <stop stop-color="#FFC500"/>
+                <stop offset="1" stop-color="#F77F00"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text light">NestWork</span>
+      </div>
+      <span class="logo-variant-label">Fond clair</span>
+    </div>
+
+    <div class="logo-variant dark-bg reveal">
+      <div class="logo-main">
+        <div class="logo-hexagon">
+          <svg viewBox="0 0 52 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M26 0L52 15V45L26 60L0 45V15L26 0Z" fill="url(#grad2)"/>
+            <path d="M18 22C18 22 22 18 26 22C30 26 34 22 34 22" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M18 30C18 30 22 26 26 30C30 34 34 30 34 30" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M22 38C22 38 24 36 26 38C28 40 30 38 30 38" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
+            <defs>
+              <linearGradient id="grad2" x1="0" y1="0" x2="52" y2="60">
+                <stop stop-color="#FFC500"/>
+                <stop offset="1" stop-color="#F77F00"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text white">NestWork</span>
+      </div>
+      <span class="logo-variant-label">Fond sombre</span>
+    </div>
+
+    <div class="logo-variant honey-bg reveal">
+      <div class="logo-main">
+        <div class="logo-hexagon">
+          <svg viewBox="0 0 52 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M26 0L52 15V45L26 60L0 45V15L26 0Z" fill="white"/>
+            <path d="M18 22C18 22 22 18 26 22C30 26 34 22 34 22" stroke="#F77F00" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M18 30C18 30 22 26 26 30C30 34 34 30 34 30" stroke="#F77F00" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M22 38C22 38 24 36 26 38C28 40 30 38 30 38" stroke="#F77F00" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
+          </svg>
+        </div>
+        <span class="logo-text white">NestWork</span>
+      </div>
+      <span class="logo-variant-label">Fond coloré</span>
+    </div>
+  </div>
+</section>
+
+<!-- 03 — COLORS -->
+<section class="section" id="colors">
+  <div class="reveal">
+    <span class="section-label">03 — Palette de Couleurs</span>
+    <h2 class="section-title">Les teintes de la ruche</h2>
+    <p class="section-desc">Une palette chaude et organique inspirée du miel, de la cire et du pollen. Chaque couleur a un rôle fonctionnel dans l'interface.</p>
+  </div>
+
+  <div class="palette-grid">
+    <div class="palette-group reveal">
+      <h4>🍯 Honey Gold — Primaire</h4>
+      <div class="palette-stack">
+        <div class="palette-swatch" style="background: #FFF9E6; color: #664400;"><span class="swatch-name">50</span><span>#FFF9E6</span></div>
+        <div class="palette-swatch" style="background: #FFE699; color: #664400;"><span class="swatch-name">200</span><span>#FFE699</span></div>
+        <div class="palette-swatch" style="background: #FFC500; color: #664400;"><span class="swatch-name">500 ★</span><span>#FFC500</span></div>
+        <div class="palette-swatch" style="background: #CC8C00; color: white;"><span class="swatch-name">700</span><span>#CC8C00</span></div>
+        <div class="palette-swatch" style="background: #664400; color: white;"><span class="swatch-name">900</span><span>#664400</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group reveal">
+      <h4>🪵 Hive Dark — Secondaire</h4>
+      <div class="palette-stack">
+        <div class="palette-swatch" style="background: #F7F5F2; color: #3D362E;"><span class="swatch-name">50</span><span>#F7F5F2</span></div>
+        <div class="palette-swatch" style="background: #D4CEC3; color: #3D362E;"><span class="swatch-name">200</span><span>#D4CEC3</span></div>
+        <div class="palette-swatch" style="background: #5C5347; color: white;"><span class="swatch-name">500 ★</span><span>#5C5347</span></div>
+        <div class="palette-swatch" style="background: #2A251F; color: white;"><span class="swatch-name">700</span><span>#2A251F</span></div>
+        <div class="palette-swatch" style="background: #0E0D0B; color: white;"><span class="swatch-name">900</span><span>#0E0D0B</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group reveal">
+      <h4>🔥 Propolis Amber — Accent</h4>
+      <div class="palette-stack">
+        <div class="palette-swatch" style="background: #FF9F1C; color: white;"><span class="swatch-name">400</span><span>#FF9F1C</span></div>
+        <div class="palette-swatch" style="background: #F77F00; color: white;"><span class="swatch-name">500 ★</span><span>#F77F00</span></div>
+        <div class="palette-swatch" style="background: #D96B00; color: white;"><span class="swatch-name">600</span><span>#D96B00</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group reveal">
+      <h4>🌿 Pollen Green — Succès</h4>
+      <div class="palette-stack">
+        <div class="palette-swatch" style="background: #8BC34A; color: white;"><span class="swatch-name">400</span><span>#8BC34A</span></div>
+        <div class="palette-swatch" style="background: #6FA332; color: white;"><span class="swatch-name">500 ★</span><span>#6FA332</span></div>
+        <div class="palette-swatch" style="background: #558B2F; color: white;"><span class="swatch-name">600</span><span>#558B2F</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group reveal">
+      <h4>👑 Royal Jelly — Premium</h4>
+      <div class="palette-stack">
+        <div class="palette-swatch" style="background: #C17BDB; color: white;"><span class="swatch-name">400</span><span>#C17BDB</span></div>
+        <div class="palette-swatch" style="background: #A855C7; color: white;"><span class="swatch-name">500 ★</span><span>#A855C7</span></div>
+        <div class="palette-swatch" style="background: #8E3FB0; color: white;"><span class="swatch-name">600</span><span>#8E3FB0</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group reveal">
+      <h4>☁️ Warm Neutrals — Base</h4>
+      <div class="palette-stack">
+        <div class="palette-swatch" style="background: #FFFDF7; color: #5C5347;"><span class="swatch-name">White</span><span>#FFFDF7</span></div>
+        <div class="palette-swatch" style="background: #FAF8F4; color: #5C5347;"><span class="swatch-name">50</span><span>#FAF8F4</span></div>
+        <div class="palette-swatch" style="background: #E8E4DB; color: #5C5347;"><span class="swatch-name">200</span><span>#E8E4DB</span></div>
+        <div class="palette-swatch" style="background: #B5AFA3; color: white;"><span class="swatch-name">400</span><span>#B5AFA3</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 — TYPOGRAPHY -->
+<section class="section" id="typo">
+  <div class="reveal">
+    <span class="section-label">04 — Typographie</span>
+    <h2 class="section-title">Trois voix, un essaim</h2>
+    <p class="section-desc">Un système typographique à trois niveaux : titrage impactant, corps lisible, et code technique.</p>
+  </div>
+
+  <div class="typo-showcase">
+    <div class="typo-row reveal">
+      <div class="typo-meta">
+        <strong>Outfit Black</strong>
+        900 · Titrage
+      </div>
+      <div class="typo-sample-h1">Bienvenue dans la Ruche</div>
+    </div>
+
+    <div class="typo-row reveal">
+      <div class="typo-meta">
+        <strong>Outfit Bold</strong>
+        700 · Sous-titres
+      </div>
+      <div class="typo-sample-h2">L'intelligence collective au service de votre équipe</div>
+    </div>
+
+    <div class="typo-row reveal">
+      <div class="typo-meta">
+        <strong>DM Sans Regular</strong>
+        400 · Corps de texte
+      </div>
+      <div class="typo-sample-body">NestWork transforme le travail à distance en expérience collaborative immersive. Chaque membre de l'équipe est représenté dans un espace virtuel où la présence et la communication sont naturelles.</div>
+    </div>
+
+    <div class="typo-row reveal">
+      <div class="typo-meta">
+        <strong>JetBrains Mono</strong>
+        400 · Code & données
+      </div>
+      <div class="typo-sample-mono">const hive = new NestWork({ team: "azapp", rooms: 6 });</div>
+    </div>
+
+    <div class="typo-row reveal">
+      <div class="typo-meta">
+        <strong>DM Sans Semi</strong>
+        600 · UI & Labels
+      </div>
+      <div class="typo-sample-ui">
+        Bouton d'action
+        <span class="tag">Tag label</span>
+        Menu item
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 — ICONOGRAPHY -->
+<section class="section" id="icons">
+  <div class="reveal">
+    <span class="section-label">05 — Iconographie</span>
+    <h2 class="section-title">Système d'icônes</h2>
+    <p class="section-desc">Des icônes hexagonales et organiques, mêlant le langage apicole à l'interface utilisateur. Stroke 1.5px, coins arrondis.</p>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L21.5 7.5V16.5L12 22L2.5 16.5V7.5L12 2Z"/>
+      </svg>
+      <span>Alvéole / Salle</span>
+    </div>
+    <div class="icon-item reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20C4 16.686 7.582 14 12 14C16.418 14 20 16.686 20 20"/>
+      </svg>
+      <span>Membre</span>
+    </div>
+    <div class="icon-item reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+      </svg>
+      <span>Buzz / Chat</span>
+    </div>
+    <div class="icon-item reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      <span>Rayon / Board</span>
+    </div>
+    <div class="icon-item reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/>
+      </svg>
+      <span>Cire / Fichier</span>
+    </div>
+    <div class="icon-item reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+      </svg>
+      <span>Nectar / Tâche</span>
+    </div>
+    <div class="icon-item reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+        <path d="M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      <span>Essaim / Équipe</span>
+    </div>
+    <div class="icon-item reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span>Reine / Admin</span>
+    </div>
+  </div>
+</section>
+
+<!-- 06 — UI COMPONENTS -->
+<section class="section" id="components">
+  <div class="reveal">
+    <span class="section-label">06 — Composants UI</span>
+    <h2 class="section-title">Le kit de construction</h2>
+    <p class="section-desc">Tous les composants suivent les principes de la ruche : formes hexagonales, couleurs miel, et interactions fluides.</p>
+  </div>
+
+  <div class="components-grid">
+    <!-- Buttons -->
+    <div class="comp-card reveal">
+      <h4>Boutons</h4>
+      <div class="btn-row">
+        <button class="btn btn-primary">🐝 Rejoindre la ruche</button>
+        <button class="btn btn-secondary">Explorer</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline">Annuler</button>
+        <button class="btn btn-ghost">En savoir plus →</button>
+      </div>
+      <div class="btn-row" style="margin-top: 8px;">
+        <button class="btn btn-primary btn-sm">Petit</button>
+        <button class="btn btn-outline btn-sm">Petit outline</button>
+      </div>
+    </div>
+
+    <!-- Inputs -->
+    <div class="comp-card reveal">
+      <h4>Champs de saisie</h4>
+      <div class="input-group">
+        <label class="input-label">Nom de la ruche</label>
+        <input type="text" class="input-field" placeholder="Ex: Design Hive" />
+      </div>
+      <div class="input-group">
+        <label class="input-label">Description</label>
+        <input type="text" class="input-field" placeholder="Décrivez votre espace..." />
+      </div>
+    </div>
+
+    <!-- Member Cards -->
+    <div class="comp-card reveal">
+      <h4>Cartes Membres</h4>
+      <div class="sample-card">
+        <div class="sample-card-avatar" style="background: linear-gradient(135deg, #FFC500, #F77F00);">J</div>
+        <div class="sample-card-content">
+          <div class="sample-card-name">Jean D.</div>
+          <div class="sample-card-role">Reine — Fondateur</div>
+        </div>
+        <span class="sample-card-badge badge-online">● En ligne</span>
+      </div>
+      <div class="sample-card">
+        <div class="sample-card-avatar" style="background: linear-gradient(135deg, #A855C7, #8E3FB0);">S</div>
+        <div class="sample-card-content">
+          <div class="sample-card-name">Sophie M.</div>
+          <div class="sample-card-role">Ouvrière — Dev Frontend</div>
+        </div>
+        <span class="sample-card-badge badge-busy">● Occupée</span>
+      </div>
+      <div class="sample-card">
+        <div class="sample-card-avatar" style="background: linear-gradient(135deg, #6FA332, #558B2F);">T</div>
+        <div class="sample-card-content">
+          <div class="sample-card-name">Thomas K.</div>
+          <div class="sample-card-role">Éclaireuse — UX Design</div>
+        </div>
+        <span class="sample-card-badge badge-away">● Absent</span>
+      </div>
+    </div>
+
+    <!-- Tags & Badges -->
+    <div class="comp-card reveal">
+      <h4>Tags & Notifications</h4>
+      <div class="tag-row" style="margin-bottom: 20px;">
+        <span class="tag tag-honey">🍯 Production</span>
+        <span class="tag tag-propolis">🔥 Urgent</span>
+        <span class="tag tag-pollen">🌿 Validé</span>
+        <span class="tag tag-royal">👑 Premium</span>
+      </div>
+      <div class="notif notif-success">✓ Tâche déplacée dans le rayon "Miel"</div>
+      <div class="notif notif-warning">⚠ Sophie a quitté l'alvéole Design</div>
+      <div class="notif notif-error">✕ Connexion à la ruche perdue</div>
+      <div class="notif notif-info">ℹ Nouvelle version du nectar disponible</div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 — HEXAGONAL ROOMS CONCEPT -->
+<section class="section" id="hex-rooms">
+  <div class="reveal">
+    <span class="section-label">07 — Concept d'Espaces</span>
+    <h2 class="section-title">Les alvéoles de la ruche</h2>
+    <p class="section-desc">Chaque espace de travail est une alvéole hexagonale. Les équipes passent d'une alvéole à l'autre naturellement.</p>
+  </div>
+
+  <div class="hex-concept reveal">
+    <h3 style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--hive-700); margin-bottom: 8px; position: relative;">Navigation entre alvéoles</h3>
+    <p style="color: var(--hive-400); font-size: 0.9rem; position: relative;">Survolez les alvéoles pour interagir</p>
+
+    <div class="hex-rooms">
+      <div style="display: flex; justify-content: center; gap: 8px;">
+        <div class="hex-room">
+          <span class="hex-room-icon">💻</span>
+          <span class="hex-room-name">Dev Lab</span>
+          <span class="hex-room-count">4 abeilles</span>
+        </div>
+        <div class="hex-room">
+          <span class="hex-room-icon">🎨</span>
+          <span class="hex-room-name">Design Hive</span>
+          <span class="hex-room-count">2 abeilles</span>
+        </div>
+        <div class="hex-room">
+          <span class="hex-room-icon">📊</span>
+          <span class="hex-room-name">Analytics</span>
+          <span class="hex-room-count">1 abeille</span>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 8px;" class="hex-row-offset">
+        <div class="hex-room">
+          <span class="hex-room-icon">☕</span>
+          <span class="hex-room-name">Pause Café</span>
+          <span class="hex-room-count">3 abeilles</span>
+        </div>
+        <div class="hex-room">
+          <span class="hex-room-icon">🎯</span>
+          <span class="hex-room-name">War Room</span>
+          <span class="hex-room-count">5 abeilles</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 — MOCKUPS -->
+<section class="section" id="mockups">
+  <div class="reveal">
+    <span class="section-label">08 — Mockups d'Écrans</span>
+    <h2 class="section-title">La ruche en action</h2>
+    <p class="section-desc">Trois écrans clés qui montrent l'application NestWork dans son environnement final.</p>
+  </div>
+
+  <div class="mockup-section">
+    <!-- MOCKUP 1: Virtual Space -->
+    <div class="reveal">
+      <span class="mockup-label">⬡ Écran 01</span>
+      <h3 class="mockup-title">L'Espace Virtuel</h3>
+      <p class="mockup-desc">La vue principale : un espace 2D où les membres se déplacent entre les alvéoles hexagonales.</p>
+    </div>
+
+    <div class="mockup-frame reveal">
+      <div class="mockup-browser-bar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-url">app.nestwork.io/space/azapp-hive</div>
+      </div>
+      <div class="mockup-content mock-space">
+        <div class="mock-space-floor"></div>
+
+        <!-- Toolbar -->
+        <div class="mock-space-toolbar">
+          <div class="mock-space-tool active">🐝</div>
+          <div class="mock-space-tool">💬</div>
+          <div class="mock-space-tool">📋</div>
+          <div class="mock-space-tool">📁</div>
+          <div class="mock-space-tool">🔍</div>
+          <div class="mock-space-tool">⚙️</div>
+        </div>
+
+        <!-- Hex Rooms -->
+        <div class="mock-space-rooms">
+          <div class="mock-space-hex room-dev">
+            <span class="room-emoji">💻</span>
+            <span class="room-label">Dev Lab</span>
+            <span class="room-members">4 membres</span>
+          </div>
+          <div class="mock-space-hex room-design">
+            <span class="room-emoji">🎨</span>
+            <span class="room-label">Design</span>
+            <span class="room-members">2 membres</span>
+          </div>
+          <div class="mock-space-hex room-meeting">
+            <span class="room-emoji">🎯</span>
+            <span class="room-label">War Room</span>
+            <span class="room-members">Meeting 14h</span>
+          </div>
+        </div>
+
+        <!-- Avatars -->
+        <div class="mock-space-avatar" style="top: 120px; left: 80px;">
+          <div class="mock-space-avatar-circle" style="background: linear-gradient(135deg, #FFC500, #F77F00);">J</div>
+          <span class="mock-space-avatar-name">Jean</span>
+          <div class="mock-space-avatar-status" style="background: #4CAF50;"></div>
+        </div>
+        <div class="mock-space-avatar" style="top: 160px; left: 160px; animation-delay: 0.5s;">
+          <div class="mock-space-avatar-circle" style="background: linear-gradient(135deg, #A855C7, #8E3FB0);">S</div>
+          <span class="mock-space-avatar-name">Sophie</span>
+          <div class="mock-space-avatar-status" style="background: #4CAF50;"></div>
+        </div>
+        <div class="mock-space-avatar" style="top: 80px; right: 120px; animation-delay: 1s;">
+          <div class="mock-space-avatar-circle" style="background: linear-gradient(135deg, #6FA332, #558B2F);">T</div>
+          <span class="mock-space-avatar-name">Thomas</span>
+          <div class="mock-space-avatar-status" style="background: #FF9800;"></div>
+        </div>
+        <div class="mock-space-avatar" style="bottom: 100px; right: 200px; animation-delay: 1.5s;">
+          <div class="mock-space-avatar-circle" style="background: linear-gradient(135deg, #2196F3, #1565C0);">L</div>
+          <span class="mock-space-avatar-name">Léa</span>
+          <div class="mock-space-avatar-status" style="background: #4CAF50;"></div>
+        </div>
+
+        <!-- Presence Bar -->
+        <div class="mock-space-presence">
+          <div class="mock-presence-users">
+            <div class="mock-presence-dot" style="background: linear-gradient(135deg, #FFC500, #F77F00);">J</div>
+            <div class="mock-presence-dot" style="background: linear-gradient(135deg, #A855C7, #8E3FB0);">S</div>
+            <div class="mock-presence-dot" style="background: linear-gradient(135deg, #6FA332, #558B2F);">T</div>
+            <div class="mock-presence-dot" style="background: linear-gradient(135deg, #2196F3, #1565C0);">L</div>
+          </div>
+          <div class="mock-presence-info"><strong>4</strong> abeilles dans la ruche · <strong>3</strong> actives</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOCKUP 2: Dashboard Chat -->
+    <div class="reveal" style="margin-top: 64px;">
+      <span class="mockup-label">⬡ Écran 02</span>
+      <h3 class="mockup-title">Le Buzz — Messagerie</h3>
+      <p class="mockup-desc">Le canal de communication principal avec navigation par alvéoles et sidebar contextuelle.</p>
+    </div>
+
+    <div class="mockup-frame reveal">
+      <div class="mockup-browser-bar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-url">app.nestwork.io/buzz/dev-lab</div>
+      </div>
+      <div class="mockup-content mock-dashboard">
+        <!-- Mini Sidebar -->
+        <div class="mock-sidebar-mini">
+          <div class="mini-logo"></div>
+          <div class="mini-icon active" title="Ruche">🏠</div>
+          <div class="mini-icon" title="Buzz">💬</div>
+          <div class="mini-icon" title="Rayons">📋</div>
+          <div class="mini-icon" title="Cire">📁</div>
+          <div class="mini-icon" title="Essaim">👥</div>
+          <div style="flex: 1;"></div>
+          <div class="mini-icon" title="Réglages">⚙️</div>
+        </div>
+
+        <!-- Sidebar Panel -->
+        <div class="mock-sidebar-panel">
+          <h3>⬡ Alvéoles</h3>
+          <div class="mock-channel active">
+            <div class="mock-channel-hex" style="background: var(--honey-50);">💻</div>
+            <span class="mock-channel-name">Dev Lab</span>
+            <span class="mock-channel-badge">3</span>
+          </div>
+          <div class="mock-channel">
+            <div class="mock-channel-hex" style="background: #F3E5F5;">🎨</div>
+            <span class="mock-channel-name">Design Hive</span>
+          </div>
+          <div class="mock-channel">
+            <div class="mock-channel-hex" style="background: #E8F5E9;">📊</div>
+            <span class="mock-channel-name">Analytics</span>
+          </div>
+          <div class="mock-channel">
+            <div class="mock-channel-hex" style="background: #FFF3E0;">🎯</div>
+            <span class="mock-channel-name">War Room</span>
+            <span class="mock-channel-badge">1</span>
+          </div>
+          <div class="mock-channel">
+            <div class="mock-channel-hex" style="background: var(--warm-100);">☕</div>
+            <span class="mock-channel-name">Pause Café</span>
+          </div>
+
+          <h3 style="margin-top: 24px;">✉️ Messages directs</h3>
+          <div class="mock-channel">
+            <div class="mock-channel-hex" style="background: linear-gradient(135deg, #A855C7, #8E3FB0); color: white; font-size: 0.6rem; font-weight: 700;">S</div>
+            <span class="mock-channel-name">Sophie M.</span>
+          </div>
+          <div class="mock-channel">
+            <div class="mock-channel-hex" style="background: linear-gradient(135deg, #6FA332, #558B2F); color: white; font-size: 0.6rem; font-weight: 700;">T</div>
+            <span class="mock-channel-name">Thomas K.</span>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="mock-main">
+          <div class="mock-main-header">
+            <div class="mock-main-title">
+              <span style="font-size: 1.2rem;">💻</span>
+              <h2>Dev Lab</h2>
+              <span class="online-count">● 4 en ligne</span>
+            </div>
+            <div class="mock-main-actions">
+              <div class="mock-action-btn">📌</div>
+              <div class="mock-action-btn">🔍</div>
+              <div class="mock-action-btn">👥</div>
+            </div>
+          </div>
+
+          <div class="mock-messages">
+            <div class="mock-msg">
+              <div class="mock-msg-avatar" style="background: linear-gradient(135deg, #FFC500, #F77F00);">J</div>
+              <div class="mock-msg-content">
+                <div class="mock-msg-header">
+                  <span class="mock-msg-name">Jean D.</span>
+                  <span class="mock-msg-time">14:23</span>
+                </div>
+                <div class="mock-msg-text">J'ai poussé la v2 du système d'authentification. Qui peut review ? 🍯</div>
+                <div class="mock-msg-reaction">🐝 3</div>
+              </div>
+            </div>
+
+            <div class="mock-msg">
+              <div class="mock-msg-avatar" style="background: linear-gradient(135deg, #A855C7, #8E3FB0);">S</div>
+              <div class="mock-msg-content">
+                <div class="mock-msg-header">
+                  <span class="mock-msg-name">Sophie M.</span>
+                  <span class="mock-msg-time">14:25</span>
+                </div>
+                <div class="mock-msg-text">Je prends ! Par contre on a un souci sur le composant Alvéole — le responsive casse sur mobile.</div>
+              </div>
+            </div>
+
+            <div class="mock-msg">
+              <div class="mock-msg-avatar" style="background: linear-gradient(135deg, #6FA332, #558B2F);">T</div>
+              <div class="mock-msg-content">
+                <div class="mock-msg-header">
+                  <span class="mock-msg-name">Thomas K.</span>
+                  <span class="mock-msg-time">14:28</span>
+                </div>
+                <div class="mock-msg-text">J'ai un fix pour ça, je le push dans 10min. Le clip-path hexagonal a besoin d'un fallback pour Safari. 🔧</div>
+                <div class="mock-msg-reaction">🍯 2</div>
+                <div class="mock-msg-reaction" style="display: inline-flex;">👍 1</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-chat-input">
+            <span>Buzz dans Dev Lab...</span>
+            <div class="mock-chat-input-actions">
+              <div class="mock-chat-icon">📎</div>
+              <div class="mock-chat-icon">😊</div>
+              <div class="mock-chat-icon" style="background: linear-gradient(135deg, var(--honey-500), var(--propolis-400)); color: white; border-radius: 6px;">➤</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOCKUP 3: Task Board -->
+    <div class="reveal" style="margin-top: 64px;">
+      <span class="mockup-label">⬡ Écran 03</span>
+      <h3 class="mockup-title">Le Rayon — Gestion de Tâches</h3>
+      <p class="mockup-desc">Un kanban thématique où les tâches suivent le cycle du miel : Nectar → Transformation → Miel.</p>
+    </div>
+
+    <div class="mockup-frame reveal">
+      <div class="mockup-browser-bar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-url">app.nestwork.io/rayon/sprint-12</div>
+      </div>
+      <div class="mockup-content mock-taskboard">
+        <div class="mock-taskboard-header">
+          <h2>📋 Rayon — Sprint 12 <span style="font-weight: 400; font-size: 0.85rem; color: var(--warm-400);">· 14 tâches</span></h2>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline btn-sm">Filtrer</button>
+            <button class="btn btn-primary btn-sm">+ Nectar</button>
+          </div>
+        </div>
+
+        <div class="mock-columns">
+          <!-- Nectar Column -->
+          <div class="mock-column">
+            <div class="mock-column-header nectar">
+              <span class="mock-column-title">🌸 Nectar <span class="mock-column-count">5</span></span>
+            </div>
+            <div class="mock-task">
+              <div class="mock-task-title">Refonte composant Alvéole mobile</div>
+              <div class="mock-task-meta">
+                <div class="mock-task-tags">
+                  <span class="mock-task-tag" style="background: #F3E5F5; color: #8E3FB0;">UI</span>
+                  <span class="mock-task-tag" style="background: #FFEBEE; color: #C62828;">Bug</span>
+                </div>
+                <div class="mock-task-assignee" style="background: linear-gradient(135deg, #A855C7, #8E3FB0);">S</div>
+              </div>
+            </div>
+            <div class="mock-task">
+              <div class="mock-task-title">API WebSocket — reconnexion auto</div>
+              <div class="mock-task-meta">
+                <div class="mock-task-tags">
+                  <span class="mock-task-tag" style="background: #E3F2FD; color: #1565C0;">Backend</span>
+                </div>
+                <div class="mock-task-assignee" style="background: linear-gradient(135deg, #FFC500, #F77F00);">J</div>
+              </div>
+            </div>
+            <div class="mock-task">
+              <div class="mock-task-title">Design système de notifications</div>
+              <div class="mock-task-meta">
+                <div class="mock-task-tags">
+                  <span class="mock-task-tag" style="background: #F3E5F5; color: #8E3FB0;">Design</span>
+                </div>
+                <div class="mock-task-assignee" style="background: linear-gradient(135deg, #6FA332, #558B2F);">T</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transformation Column -->
+          <div class="mock-column">
+            <div class="mock-column-header processing">
+              <span class="mock-column-title">⚡ Transformation <span class="mock-column-count">3</span></span>
+            </div>
+            <div class="mock-task">
+              <div class="mock-task-title">Système de présence temps réel</div>
+              <div class="mock-task-meta">
+                <div class="mock-task-tags">
+                  <span class="mock-task-tag" style="background: #E3F2FD; color: #1565C0;">Backend</span>
+                  <span class="mock-task-tag" style="background: #FFF3E0; color: #E65100;">Core</span>
+                </div>
+                <div class="mock-task-assignee" style="background: linear-gradient(135deg, #FFC500, #F77F00);">J</div>
+              </div>
+            </div>
+            <div class="mock-task">
+              <div class="mock-task-title">Intégration stockage fichiers S3</div>
+              <div class="mock-task-meta">
+                <div class="mock-task-tags">
+                  <span class="mock-task-tag" style="background: #E3F2FD; color: #1565C0;">Infra</span>
+                </div>
+                <div class="mock-task-assignee" style="background: linear-gradient(135deg, #2196F3, #1565C0);">L</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Miel Column -->
+          <div class="mock-column">
+            <div class="mock-column-header honey">
+              <span class="mock-column-title">🍯 Miel <span class="mock-column-count">6</span></span>
+            </div>
+            <div class="mock-task">
+              <div class="mock-task-title">Auth OAuth2 + JWT</div>
+              <div class="mock-task-meta">
+                <div class="mock-task-tags">
+                  <span class="mock-task-tag" style="background: #E8F5E9; color: #2E7D32;">Done</span>
+                </div>
+                <div class="mock-task-assignee" style="background: linear-gradient(135deg, #FFC500, #F77F00);">J</div>
+              </div>
+            </div>
+            <div class="mock-task">
+              <div class="mock-task-title">Navigation hexagonale v1</div>
+              <div class="mock-task-meta">
+                <div class="mock-task-tags">
+                  <span class="mock-task-tag" style="background: #E8F5E9; color: #2E7D32;">Done</span>
+                </div>
+                <div class="mock-task-assignee" style="background: linear-gradient(135deg, #6FA332, #558B2F);">T</div>
+              </div>
+            </div>
+            <div class="mock-task">
+              <div class="mock-task-title">Chat temps réel — MVP</div>
+              <div class="mock-task-meta">
+                <div class="mock-task-tags">
+                  <span class="mock-task-tag" style="background: #E8F5E9; color: #2E7D32;">Done</span>
+                </div>
+                <div class="mock-task-assignee" style="background: linear-gradient(135deg, #A855C7, #8E3FB0);">S</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 — LEXICON -->
+<section class="section" id="lexicon">
+  <div class="reveal">
+    <span class="section-label">09 — Lexique Apicole</span>
+    <h2 class="section-title">Le vocabulaire de la ruche</h2>
+    <p class="section-desc">Chaque terme technique est traduit dans le langage de la ruche pour créer une expérience immersive et mémorable.</p>
+  </div>
+
+  <div class="lexicon-grid">
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">🏠</div>
+      <div class="lexicon-content">
+        <h4>La Ruche</h4>
+        <div class="lexicon-original">→ Workspace</div>
+        <p>L'espace de travail principal qui regroupe toute l'équipe</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">⬡</div>
+      <div class="lexicon-content">
+        <h4>Alvéole</h4>
+        <div class="lexicon-original">→ Room / Channel</div>
+        <p>Un espace thématique hexagonal (Dev, Design, Café...)</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">🐝</div>
+      <div class="lexicon-content">
+        <h4>Abeille</h4>
+        <div class="lexicon-original">→ Member / User</div>
+        <p>Un membre de l'équipe actif dans la ruche</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">👑</div>
+      <div class="lexicon-content">
+        <h4>Reine</h4>
+        <div class="lexicon-original">→ Admin / Manager</div>
+        <p>L'administrateur principal de la ruche</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">🔊</div>
+      <div class="lexicon-content">
+        <h4>Le Buzz</h4>
+        <div class="lexicon-original">→ Chat / Messaging</div>
+        <p>Le système de messagerie instantanée</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">🌸</div>
+      <div class="lexicon-content">
+        <h4>Nectar</h4>
+        <div class="lexicon-original">→ Task (To Do)</div>
+        <p>Une tâche à réaliser, matière première du travail</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">🍯</div>
+      <div class="lexicon-content">
+        <h4>Miel</h4>
+        <div class="lexicon-original">→ Task (Done) / Livrable</div>
+        <p>Une tâche terminée, le produit fini</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">📋</div>
+      <div class="lexicon-content">
+        <h4>Le Rayon</h4>
+        <div class="lexicon-original">→ Board / Kanban</div>
+        <p>Le tableau de gestion des tâches</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">📁</div>
+      <div class="lexicon-content">
+        <h4>La Cire</h4>
+        <div class="lexicon-original">→ Files / Storage</div>
+        <p>Le système de stockage et partage de fichiers</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">👥</div>
+      <div class="lexicon-content">
+        <h4>L'Essaim</h4>
+        <div class="lexicon-original">→ Team</div>
+        <p>Un groupe de travail au sein de la ruche</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">🔧</div>
+      <div class="lexicon-content">
+        <h4>Ouvrière</h4>
+        <div class="lexicon-original">→ Developer / Contributor</div>
+        <p>Un membre actif qui produit et contribue</p>
+      </div>
+    </div>
+    <div class="lexicon-item reveal">
+      <div class="lexicon-icon">🔭</div>
+      <div class="lexicon-content">
+        <h4>Éclaireuse</h4>
+        <div class="lexicon-original">→ Scout / Designer / Researcher</div>
+        <p>Celui qui explore et propose de nouvelles directions</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 — MOTION -->
+<section class="section" id="motion">
+  <div class="reveal">
+    <span class="section-label">10 — Motion & Animation</span>
+    <h2 class="section-title">Le mouvement de l'essaim</h2>
+    <p class="section-desc">Des animations fluides et organiques inspirées du vol des abeilles. Jamais brusques, toujours naturelles.</p>
+  </div>
+
+  <div class="motion-grid">
+    <div class="motion-card reveal">
+      <h4>Hover — Butinage</h4>
+      <p>ease-in-out · 200-300ms</p>
+      <div class="motion-demo">
+        <div class="motion-bee">🐝</div>
+      </div>
+    </div>
+    <div class="motion-card reveal">
+      <h4>Pulse — Battement</h4>
+      <p>ease-in-out · 2s infinite</p>
+      <div class="motion-demo">
+        <div class="motion-hex-pulse"></div>
+      </div>
+    </div>
+    <div class="motion-card reveal">
+      <h4>Reveal — Éclosion</h4>
+      <p>ease · 400-600ms</p>
+      <div class="motion-demo">
+        <div class="motion-slide-demo"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span class="footer-text">NestWork — Direction Artistique v1.0 · Février 2026</span>
+  <span class="footer-badge">
+    <span style="width: 20px; height: 20px; background: linear-gradient(135deg, var(--honey-500), var(--propolis-400)); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: inline-block;"></span>
+    AZAPP Lab
+  </span>
+</footer>
+
+<!-- SCROLL REVEAL JS -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const reveals = document.querySelectorAll('.reveal');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, index * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Smooth nav background on scroll
+  const nav = document.querySelector('.nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      nav.style.background = 'rgba(255, 253, 247, 0.95)';
+      nav.style.boxShadow = '0 1px 8px rgba(92, 83, 71, 0.06)';
+    } else {
+      nav.style.background = 'rgba(255, 253, 247, 0.85)';
+      nav.style.boxShadow = 'none';
+    }
+  });
+});
+</script>
+
+</body>
+</html>

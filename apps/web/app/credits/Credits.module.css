@@ -1,0 +1,132 @@
+.page {
+  --surface: #fffdf7;
+  --surface-2: #f2efe8;
+  --border: #e8e4db;
+  --ink: #18191d;
+  --ink-2: #51545c;
+  --ink-3: #777b85;
+  --honey: #ffc500;
+  --propolis: #f77f00;
+  min-height: 100vh;
+  color: var(--ink);
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(rgba(24, 25, 29, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 25, 29, .035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.header {
+  width: min(920px, calc(100% - 48px));
+  min-height: 80px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.backLink:hover { color: var(--propolis); }
+
+.content {
+  width: min(800px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 90px 0 110px;
+}
+
+.kicker, .cardLabel {
+  color: #a66f00;
+  font: 700 11px/1.4 'JetBrains Mono', monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.content h1 {
+  margin-top: 14px;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: clamp(48px, 8vw, 76px);
+  font-weight: 900;
+  line-height: .98;
+  letter-spacing: -.045em;
+}
+
+.intro {
+  max-width: 620px;
+  margin-top: 24px;
+  color: var(--ink-2);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.creditCard {
+  margin-top: 40px;
+  padding: 30px;
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 28px;
+  border: 3px solid var(--ink);
+  background: var(--surface);
+  box-shadow: 7px 7px 0 var(--honey);
+}
+
+.creditCard + .creditCard { margin-top: 28px; box-shadow: 7px 7px 0 var(--border); }
+.creditCard h2 { margin-top: 7px; font: 800 27px/1.15 Outfit, sans-serif; }
+.creditCard p:not(.cardLabel) { margin-top: 12px; color: var(--ink-2); line-height: 1.65; }
+.creditCard a { width: fit-content; margin-top: 17px; display: inline-flex; align-items: center; gap: 7px; color: #875c00; font-weight: 800; }
+.creditCard a:hover { color: var(--propolis); }
+
+.pixelMark {
+  width: 72px;
+  height: 72px;
+  padding: 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  background: var(--ink);
+  border: 4px solid var(--ink);
+}
+
+.pixelMark i { width: 11px; background: var(--honey); }
+.pixelMark i:first-child { height: 21px; background: var(--propolis); }
+.pixelMark i:nth-child(2) { height: 38px; }
+.pixelMark i:last-child { height: 29px; background: #6fa332; }
+
+.grassMark {
+  width: 72px;
+  height: 72px;
+  border: 4px solid var(--ink);
+  background-color: #6fa332;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,.11) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(24,25,29,.08) 25%, transparent 25%);
+  background-size: 8px 8px;
+  image-rendering: pixelated;
+}
+
+.licenseNote {
+  margin-top: 38px;
+  padding: 18px 20px;
+  color: var(--ink-2);
+  border-left: 5px solid var(--propolis);
+  background: var(--surface-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (max-width: 620px) {
+  .header, .content { width: min(100% - 30px, 520px); }
+  .backLink { font-size: 12px; }
+  .content { padding: 64px 0 80px; }
+  .creditCard { grid-template-columns: 1fr; padding: 24px; }
+}

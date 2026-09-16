@@ -1,0 +1,59 @@
+name: CI
+
+# Gate before code reaches prod: a PR must build + typecheck cleanly.
+# (Enable branch protection on `main` requiring this check.)
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    env:
+      # prisma generate reads this; no real DB is contacted in CI.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      # Production builds must never silently target localhost.
+      NEXT_PUBLIC_API_URL: https://api.example.test
+      NEXT_PUBLIC_WS_URL: wss://api.example.test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Shared publishes runtime/types from dist; clean CI checkouts must build it
+      # before either app resolves @nestwork/shared.
+      - run: pnpm --filter @nestwork/shared build
+
+      # The real anti-breakage filter: types must be sound on both apps.
+      - run: pnpm --filter @nestwork/server typecheck
+      - run: pnpm --filter @nestwork/web typecheck
+
+      - run: pnpm --filter @nestwork/server test
+      - run: pnpm --filter @nestwork/web test
+
+      # Lint the whole monorepo (ESLint config is now unified — the root config
+      # carries the react-hooks plugin). Fails on errors; `any` stays a warning.
+      - run: pnpm lint
+
+      # Build an allowlisted public snapshot and fail if a commercial asset,
+      # local env file or required licensing document leaks into it.
+      - run: pnpm public:check
+
+      # Full builds = proof the apps actually compile/bundle.
+      - run: pnpm --filter @nestwork/server build
+      # Start the compiled artifact on an ephemeral port, verify shared runtime
+      # exports resolve, and hit /health without connecting to a database.
+      - run: pnpm --filter @nestwork/server test:smoke
+      - run: pnpm --filter @nestwork/web build
+
+      # Known moderate/high/critical production-chain vulnerabilities block the merge.
+      - run: pnpm audit --prod --audit-level moderate

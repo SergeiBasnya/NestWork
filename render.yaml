@@ -1,0 +1,37 @@
+# Render Blueprint — déploie le serveur NestWork (Express + Socket.io).
+# Le front Next.js se déploie séparément sur un hébergement public HTTPS.
+#
+# Pour l'utiliser : Render → New → Blueprint → connecte le repo GitHub.
+# Render lira ce fichier. Renseigne ensuite les variables marquées sync:false.
+services:
+  - type: web
+    name: nestwork-server
+    runtime: node
+    plan: free
+    region: frankfurt          # proche de la base Neon (eu-central-1)
+    rootDir: .                 # racine du monorepo pnpm
+    healthCheckPath: /ready
+    # --prod=false force l'install des devDependencies (typescript) nécessaires au build
+    buildCommand: corepack enable && pnpm install --frozen-lockfile --prod=false && pnpm --filter @nestwork/shared build && pnpm --filter @nestwork/server build && pnpm --filter @nestwork/server exec prisma migrate deploy
+    # Lancer node directement (pas via pnpm) : démarrage plus rapide, pas de
+    # corepack au boot, et sortie propre sur SIGTERM (évite les boucles de redéploiement).
+    startCommand: node apps/server/dist/index.js
+    envVars:
+      - key: NODE_VERSION
+        value: "22"      # pnpm 11.3.0 exige Node >= 22.13
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL        # chaîne Neon (sync:false = à saisir dans le dashboard)
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: CLIENT_ORIGIN       # URL du front Vercel, ex: https://nestwork.vercel.app
+        sync: false
+      - key: REFRESH_COOKIE_SAME_SITE # "none" si le front et l'API sont sur des sites différents
+        sync: false
+      - key: CLOUDFLARE_TURN_KEY_ID      # Cloudflare Realtime → TURN Keys (relais WebRTC)
+        sync: false
+      - key: CLOUDFLARE_TURN_API_TOKEN   # idem ; vide = STUN-only (coupures NAT strict/4G)
+        sync: false

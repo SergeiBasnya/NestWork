@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  /* NestWork — thème Ruche (Bee). Clair = neutres chauds + miel. */
+  :root {
+    --color-surface: #FFFDF7;
+    --color-surface-secondary: #FAF8F4;
+    --color-surface-tertiary: #F2EFE8;
+    --color-border: #E8E4DB;
+    --color-border-light: #F2EFE8;
+    --color-text-primary: #2A251F;
+    --color-text-secondary: #5C5347;
+    --color-text-tertiary: #8A847A;
+    --color-sidebar-bg: #2A251F;
+    --color-panel-bg: #FFFFFF;
+    --color-input-bg: #FAF8F4;
+    --color-input-border: #E8E4DB;
+    --color-hover-bg: #F2EFE8;
+    /* Active-state honey treatment (WCAG AA). Light: dark text on pale honey. */
+    --color-active-bg: rgba(255, 197, 0, 0.16);
+    --color-active-text: #2A251F; /* hive-700, ratio ~13.9 on the pale honey */
+    --color-active-accent: #CC8C00; /* honey-700, for the side pill / icon accent */
+  }
+
+  .dark {
+    --color-surface: #1C1915;
+    --color-surface-secondary: #2A251F;
+    --color-surface-tertiary: #3D362E;
+    --color-border: #3D362E;
+    --color-border-light: #2A251F;
+    --color-text-primary: #FFFDF7;
+    --color-text-secondary: #B8AFA0;
+    --color-text-tertiary: #8C8070;
+    --color-sidebar-bg: #0E0D0B;
+    --color-panel-bg: #1C1915;
+    --color-input-bg: #2A251F;
+    --color-input-border: #3D362E;
+    --color-hover-bg: #3D362E;
+    /* Dark: bright honey text on darker honey wash (ratio ~8). */
+    --color-active-bg: rgba(255, 197, 0, 0.18);
+    --color-active-text: #FFDB66; /* honey-300 */
+    --color-active-accent: #FFC500; /* honey */
+  }
+
+  body {
+    @apply bg-[var(--color-surface)] text-[var(--color-text-primary)] antialiased;
+  }
+
+  /* Visible keyboard focus everywhere (a11y) — honey ring. */
+  :focus-visible {
+    outline: 2px solid #ffc500;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* Respect reduced-motion: kill animations/transitions for users who ask. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

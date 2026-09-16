@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: nestwork_dev
+      POSTGRES_USER: nestwork
+      POSTGRES_PASSWORD: nestwork
+    ports:
+      - "${NESTWORK_POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nestwork -d nestwork_dev"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - nestwork_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  nestwork_postgres_data:

@@ -1,0 +1,25 @@
+node_modules/
+dist/
+.next/
+.env
+.env.*
+!.env.example
+!apps/server/.env.example
+!apps/web/.env.local.example
+uploads/
+*.log
+*.tsbuildinfo
+.turbo/
+.pnpm-store/
+out/
+coverage/
+.claude/
+.DS_Store
+
+# Bibliothèque commerciale privée — jamais incluse dans l'export open source.
+apps/web/public/Rsc/
+apps/web/public/Modern/
+apps/web/public/AnimObjects/
+apps/web/public/Emotes/
+apps/web/public/Characters/named/
+apps/web/public/Characters/*.png
